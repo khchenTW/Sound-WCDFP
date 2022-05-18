@@ -44,8 +44,8 @@ def findpoints(task, higher_priority_tasks, mode = 0):
 '''
 def logmgf_tasks(task, other, interval):
     def logmgf_task(task, interval):
-        num_jobs_realeased = int(math.ceil(float(interval)/task['period']))
-        return str(num_jobs_realeased) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
+        num_jobs_released = int(math.ceil(float(interval)/task['period']))
+        return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
     s = symbols('s')
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
     func = lambdify(s, sympify(func), 'mpmath')
@@ -59,8 +59,8 @@ def logmgf_tasks(task, other, interval):
 '''
 def logmgf_tasks_carry(task, other, interval):
     def logmgf_task(task, interval):
-        num_jobs_realeased = int(math.ceil(float(interval)/task['period']))
-        return str(num_jobs_realeased) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
+        num_jobs_released = int(math.ceil(float(interval+task['deadline'])/task['period']))
+        return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
     s = symbols('s')
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
     func = lambdify(s, sympify(func), 'mpmath')
@@ -74,8 +74,8 @@ def logmgf_tasks_carry(task, other, interval):
 '''
 def logmgf_tasks_inflation(task, other, interval):
     def logmgf_task(task, interval):
-        num_jobs_realeased = int(math.ceil(float(interval)/task['period']))
-        return str(num_jobs_realeased) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
+        num_jobs_released = int(math.ceil(float(interval)/task['period']))
+        return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
     s = symbols('s')
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
     func = lambdify(s, sympify(func), 'mpmath')
@@ -135,7 +135,6 @@ def optimal_chernoff_taskset_all(taskset, bound, s_min = 0, s_max = 10e100):
         start_time = time.time()
         times = findpoints(task, taskset[:i])
         if bound == 'Inflation':
-            print(bound)
             functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
         else:
             functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
