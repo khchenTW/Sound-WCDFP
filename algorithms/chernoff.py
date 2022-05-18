@@ -37,7 +37,7 @@ def findpoints(task, higher_priority_tasks, mode = 0):
     return points
 
 '''
-@method: Generates the log-moment generating function.
+@method: Generates the log-moment generating function (DATE'19).
 @param task: Task under analysis
 @param other: Higher-priority tasks
 @param interval: Time interval t under analysis
@@ -50,6 +50,37 @@ def logmgf_tasks(task, other, interval):
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
     func = lambdify(s, sympify(func), 'mpmath')
     return func
+
+'''
+@method: Generates the log-moment generating function with the carry-in method.
+@param task: Task under analysis
+@param other: Higher-priority tasks
+@param interval: Time interval t under analysis
+'''
+def logmgf_tasks_carry(task, other, interval):
+    def logmgf_task(task, interval):
+        num_jobs_realeased = int(math.ceil(float(interval)/task['period']))
+        return str(num_jobs_realeased) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
+    s = symbols('s')
+    func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
+    func = lambdify(s, sympify(func), 'mpmath')
+    return func
+
+'''
+@method: Generates the log-moment generating function with the inflation method.
+@param task: Task under analysis
+@param other: Higher-priority tasks
+@param interval: Time interval t under analysis
+'''
+def logmgf_tasks_inflation(task, other, interval):
+    def logmgf_task(task, interval):
+        num_jobs_realeased = int(math.ceil(float(interval)/task['period']))
+        return str(num_jobs_realeased) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
+    s = symbols('s')
+    func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
+    func = lambdify(s, sympify(func), 'mpmath')
+    return func
+
 
 '''
 @method: Finds argmin function within tolerance.
@@ -93,16 +124,23 @@ def goldensectionsearch(function, a, b, tolerance=1e-5):
 '''
 @method: Computes the minimal chernoff bound.
 @param taskset: Taskset under analysis.
+@param bound: name of bound
 @param s_min: Beginning of interval under analysis.
 @param s_max: Ending of interval under analysis.
-@return list of deadline miss probabilities for each task in the task set and computation time
+@return list of deadline miss probabilities for each task in the task set and runtime
 '''
-def optimal_chernoff_taskset_all(taskset, s_min = 0, s_max = 10e100):
+def optimal_chernoff_taskset_all(taskset, bound, s_min = 0, s_max = 10e100):
     results = []
     for i, task in enumerate(taskset):
         start_time = time.time()
         times = findpoints(task, taskset[:i])
-        functions = (logmgf_tasks(task, taskset[:i], time) for time in times)
+        if bound == 'Inflation':
+            print(bound)
+            functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
+        else:
+            functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
+
+        #golden section search
         candidates = []
         for function in functions:
             optimal = goldensectionsearch(function, s_min, s_max)   
@@ -112,10 +150,15 @@ def optimal_chernoff_taskset_all(taskset, s_min = 0, s_max = 10e100):
         results.append({'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time})
     return results
 
-def optimal_chernoff_taskset_lowest(taskset, s_min = 0, s_max = 10e100):
+def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
     start_time = time.time()
     times = findpoints(taskset[-1], taskset[:-1])
-    functions = (logmgf_tasks(taskset[-1], taskset[:-1], time) for time in times)
+    if bound == 'Inflation':
+        functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
+    else:
+        functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
+
+    #golden section search
     candidates = []
     for function in functions:
         optimal = goldensectionsearch(function, s_min, s_max)   

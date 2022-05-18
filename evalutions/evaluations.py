@@ -58,7 +58,6 @@ def main():
                             raise Exception("Could not read")
 
                         # Init lists for storing Calculated DMP
-                        results_chernoff = []
                         results_carry = []
                         results_inflation = []
                         rel = []
@@ -70,8 +69,8 @@ def main():
                             rel = (p.map(func_star, zip(tasksets,itertools.repeat(max_fault_rate))))
                         print(rel)
                         for i in rel:
-                            results_chernoff.append(i[0])
-                        np.save('../results/mp_res_chernoff_' + filename + '.npy', results_chernoff)
+                            results_carry.append(i[0])
+                            results_inflation.append(i[1])
                         np.save('../results/mp_res_carry_' + filename + '.npy', results_carry)
                         np.save('../results/mp_res_inflation_' + filename + '.npy', results_inflation)
                     else:
@@ -97,17 +96,13 @@ def main():
                             raise Exception("Could not read")
                         
                         # Init lists for storing Calculated DMP
-                        results_chernoff = []
                         results_carry = []
                         results_inflation = []
                         for taskset in tasksets:
-                            results_chernoff.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
-                            results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
-                            results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
-                        print(results_chernoff)
+                            results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
+                            results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
                         print(results_carry)
                         print(results_inflation)
-                        np.save('../results/res_chernoff_' + filename + '.npy', results_chernoff)
                         np.save('../results/res_carry_' + filename + '.npy', results_carry)
                         np.save('../results/res_inflation_' + filename + '.npy', results_inflation)
                     else:
@@ -118,21 +113,17 @@ def main():
 
 def insideroutine(taskset, max_fault_rate):
     print(taskset[0])
-    results_chernoff = []
     results_carry = []
     results_inflation = []
     
-    print('Computing the original chernoff bounds')
-    results_chernoff.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
-    
     print('Computing the chernoff bounds with Carry-in')
-    results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
+    results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
     
     print('Computing the chernoff bounds with Inflation')
-    results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
+    results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
     
     print('DONE!')
-    return [results_chernoff, results_carry, results_inflation]
+    return [results_carry, results_inflation]
 
 if __name__=="__main__":
     main()
