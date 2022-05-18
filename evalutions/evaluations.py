@@ -43,7 +43,7 @@ def main():
             parallel = True
     if parallel == True:
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
-            print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r' % (num_sets, num_tasks, fault_rate, rounded))
+            print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
             #for utilization in np.arange(5, 100, 5):
             #for utilization in np.arange(50, 55, 20):
             for utilization in np.arange(70, 75, 20):
@@ -72,6 +72,8 @@ def main():
                         for i in rel:
                             results_chernoff.append(i[0])
                         np.save('../results/mp_res_chernoff_' + filename + '.npy', results_chernoff)
+                        np.save('../results/mp_res_carry_' + filename + '.npy', results_carry)
+                        np.save('../results/mp_res_inflation_' + filename + '.npy', results_inflation)
                     else:
                         raise Exception("Please specify an identifier!")
 
@@ -80,9 +82,9 @@ def main():
 
     else:
         # single thread version
-        print ("This is not ready for use")
+        print ('Single Thread')
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
-            print('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r' % (num_sets, num_tasks, fault_rate, rounded))
+            print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
             for utilization in np.arange(70, 75, 20):
                 try:
                     if ident is not None:
@@ -99,8 +101,15 @@ def main():
                         results_carry = []
                         results_inflation = []
                         for taskset in tasksets:
-                            results_chernoff.append(chernoff.optimal_chernoff_taskset_all(taskset))
+                            results_chernoff.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
+                            results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
+                            results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset))
+                        print(results_chernoff)
+                        print(results_carry)
+                        print(results_inflation)
                         np.save('../results/res_chernoff_' + filename + '.npy', results_chernoff)
+                        np.save('../results/res_carry_' + filename + '.npy', results_carry)
+                        np.save('../results/res_inflation_' + filename + '.npy', results_inflation)
                     else:
                         raise Exception("Please specify an identifier!")
                 except IOError:

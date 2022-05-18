@@ -109,7 +109,7 @@ def optimal_chernoff_taskset_all(taskset, s_min = 0, s_max = 10e100):
             candidates.append((optimal, function(optimal)))
         optimal = candidates[np.argmin([x[1] for x in candidates])]
         elapsed_time = time.time() - start_time
-        results.append({'s_opt' : optimal[0], 'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time})
+        results.append({'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time})
     return results
 
 def optimal_chernoff_taskset_lowest(taskset, s_min = 0, s_max = 10e100):
@@ -122,4 +122,4 @@ def optimal_chernoff_taskset_lowest(taskset, s_min = 0, s_max = 10e100):
         candidates.append((optimal, function(optimal)))
     optimal = candidates[np.argmin([x[1] for x in candidates])]
     elapsed_time = time.time() - start_time
-    return {'s_opt' : optimal[0], 'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time}
+    return {'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time}
