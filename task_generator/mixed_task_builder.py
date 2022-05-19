@@ -1,5 +1,5 @@
 '''
-Author: Georg von der Brueggen, Kuan-Hsun Chen
+Author: Georg von der Brueggen, Kuan-Hsun Chen, Niklas Ueter
 '''
 
 from __future__ import division

@@ -1,3 +1,7 @@
+'''
+Author: Niklas Ueter, Kuan-Hsun Chen
+'''
+
 from __future__ import division
 import scipy
 from scipy.optimize import bisect
@@ -17,6 +21,8 @@ import numpy as np
 import sys, getopt
 import os
 import math
+import heapq
+import itertools
 
 def findpoints(task, higher_priority_tasks, mode = 0):
     points = []
@@ -67,6 +73,32 @@ def logmgf_tasks_carry(task, other, interval):
     return func
 
 '''
+@method: Generate an inflation pdf based on Sample and Inflate directly.
+@param task: Task i under inflation
+@param a: number of jobs released in the interval
+@param b: jobs released over interval + relative deadlines of tasks that are affected by the task i, i.e., i to k-1.
+'''
+def sample_inflate(task, a, b):
+    print ('a:'+str(a)+' b:'+str(b))
+    # Sample b the probabilistic execution time of task 
+    # assume task only has two modes
+
+    sample = list(itertools.product((0,1), repeat = b))
+    events = list(itertools.combinations_with_replacement((0,1), a))
+
+    # Select only a largest values among the samples as the inflated execution time
+
+    select = list(heapq.nlargest(a, i) for i in sample)
+    select = list(sum(i) for i in a)
+    events = list(sum(i) for i in events)
+    numbers = list(select.count(i) for i in events)
+    print (numbers)
+
+    # TODO Return the inflated distribution
+    task['infpdf'] = [(task['execution'], 1-task['prob']), (task['abnormal_exe'], task['prob'])]
+    return task
+
+'''
 @method: Generates the log-moment generating function with the inflation method.
 @param task: Task under analysis
 @param other: Higher-priority tasks
@@ -74,10 +106,27 @@ def logmgf_tasks_carry(task, other, interval):
 '''
 def logmgf_tasks_inflation(task, other, interval):
     def logmgf_task(task, interval):
+        # Calculate the number of jobs released in the interval
         num_jobs_released = int(math.ceil(float(interval)/task['period']))
-        return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
+        # Get the index of task -- if it is in the list of higher priority tasks
+        result = np.where(other == task)
+        if len(result) > 0 and len(result[0]) > 0:
+            # the task is in hp(\tau_k)
+            ind = result[0][0]
+            # Calculate the extended interval
+            extInterval = interval + sum(tsk['deadline'] for tsk in other[ind:])
+            # TODO make an inflated task
+            task = sample_inflate(task, num_jobs_released, int(math.ceil(float(extInterval)/task['period'])))
+            print(task['infpdf'])
+
+            # return the mgf form with the inflated task
+            return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['infpdf']) + ')'
+        else:
+            #don't do inflation but return the function directly
+            return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
     s = symbols('s')
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
+    #print(func)
     func = lambdify(s, sympify(func), 'mpmath')
     return func
 
@@ -154,6 +203,9 @@ def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
     times = findpoints(taskset[-1], taskset[:-1])
     if bound == 'Inflation':
         functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
+        #print('Taskset:')
+        #for tsk in taskset:
+            #print(tsk['deadline'])
     else:
         functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
 
