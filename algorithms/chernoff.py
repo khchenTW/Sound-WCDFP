@@ -74,53 +74,11 @@ def logmgf_tasks_carry(task, other, interval):
     return func
 
 '''
-@method: Generate an inflation pdf based on Sample and Inflate directly with multi-normial distribution.
-@param task: Task i under inflation
-@param a: number of jobs released in the interval
-@param b: jobs released over interval + relative deadlines of tasks that are affected by the task i, i.e., i to k-1.
-'''
-def sample_inflate_multi(task, a, b):
-    print ('a:'+str(a)+' b:'+str(b))
-    # Sample b the probabilistic execution time of task 
-    # assume task only has two modes
-
-    sample = list(itertools.product((0,1), repeat = b))
-    #print (sample)
-
-    events = list(itertools.combinations_with_replacement((0,1), a))
-    #print (events)    
-
-    # Select only a largest values among the samples as the inflated execution time
-
-    select = list(heapq.nlargest(a, i) for i in sample)
-    select = list(sum(i) for i in select)
-    events = list(sum(i) for i in events)
-    print (events)    
-    numbers = list(select.count(i) for i in events)
-    print (numbers)
-
-    # TODO Return the inflated distribution
-    #for event, probability in zip(events, probability ):
-        #task['infpdf'].append((event*task['abnormal_exe']+(a-event)*task['execution'], probability)) 
-    task['infpdf'] = [(task['execution'], 1-task['prob']), (task['abnormal_exe'], task['prob'])]
-    return task
-
-'''
 @method: Generate an inflation pdf based on Sample and Inflate directly with bernoulli distribution.
 @param task: Task i under inflation
 @param a: number of jobs released in the interval
 @param b: jobs released over interval + relative deadlines of tasks that are affected by the task i, i.e., i to k-1.
 '''
-def sample_inflate_bernoulli(task, a, b):
-    task['infpdf'] = list()
-    if a > b:
-        print ("SAI is not applicable here, so no inflation")
-        return task
-    # assume task only has two modes
-    for eventL in range(a+1):
-        task['infpdf'].append(((eventL*task['abnormal_exe'] + (a-eventL)*task['execution']), (special.binom(b, eventL)*(task['prob'])**eventL)*((1-task['prob'])**(b-eventL))))
-    return task
-
 def sample_inflate_bernoulli_2(task, a, b):
     task['infpdf'] = list()
     if a > b:
@@ -156,13 +114,13 @@ def logmgf_tasks_inflation(task, other, interval):
             # Calculate the extended interval
             extInterval = interval + sum(tsk['deadline'] for tsk in other[ind:])
             # make an inflated task
-            task = sample_inflate_bernoulli(task, num_jobs_released, int(math.ceil(float(extInterval)/task['period'])))
+            task = sample_inflate_bernoulli2(task, num_jobs_released, int(math.ceil(float(extInterval)/task['period'])))
             #print(task['infpdf'])
 
             # return the mgf form with the inflated task
             return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['infpdf']) + ')'
         else:
-            #don't do inflation but return the function directly
+            # don't do inflation but return the function directly
             return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
     s = symbols('s')
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
