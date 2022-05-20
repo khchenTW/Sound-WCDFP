@@ -21,7 +21,7 @@ rcParams['font.sans-serif'] = ['Tahoma']
 rcParams['ps.useafm'] = True
 rcParams['pdf.use14corefonts'] = True
 rcParams['text.usetex'] = True
-rcParams["figure.figsize"] = (10,8)
+rcParams["figure.figsize"] = (8,10)
 
 def plot_datasets(dataset, view, utilization):
     figlabel = itertools.cycle(('a','b','c','d','e','f','g','h','i'))
@@ -30,8 +30,7 @@ def plot_datasets(dataset, view, utilization):
     names = []
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    #ax.tick_params(labelcolor = 'w', top = 'on', bottom = 'on', left = 'on', right = 'on')
-    #fig.subplots_adjust (top = 0.5, bottom = 0.2, left = 0.1, right = 0.95, hspace = 0.3, wspace=0.05)
+    fig.subplots_adjust (top = 0.5, bottom = 0.2, left = 0.1, right = 0.95, hspace = 0.3, wspace=0.05)
 
     bxinput = []
     ori = []
@@ -52,6 +51,7 @@ def plot_datasets(dataset, view, utilization):
     ax.tick_params(axis='both', which='major',labelsize=12)
     
     labels = ['Original', 'Carry-In', 'Inflation']
+    #labels = ['Original', 'Carry-In']
     #the blue box
     boxprops = dict(linewidth=2, color='blue')
     #the median line
