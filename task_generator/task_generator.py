@@ -95,6 +95,19 @@ def CSet_generate_rounded(Pmin,numLog):
         PSet.append(pair)
         j=j+1;
 
+def CSet_generate_rounded_limited(Pmin,numLog):
+    global USet,PSet
+    j=0
+    for i in USet:
+        thN=j%numLog
+        p=random.uniform(Pmin*math.pow(1, thN), Pmin*math.pow(1, thN+1))
+        pair={}
+        pair['period']=round(p,2)
+        pair['deadline']=round(p,2)#*random.uniform(1)
+        pair['execution']=round(i*p,2)
+        PSet.append(pair)
+        j=j+1;
+
 def init():
     global USet,PSet
     USet=[]

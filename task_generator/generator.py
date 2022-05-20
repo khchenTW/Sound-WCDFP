@@ -21,7 +21,8 @@ from algorithms import TDA
 def tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_task, num_sets):
     def taskset_gen_with_tda(utilization, hard_task_factor, fault_rate, num_task):
         while True:
-            tasks = task_generator.taskGeneration_rounded(num_task, utilization)
+            #tasks = task_generator.taskGeneration_rounded(num_task, utilization)
+            tasks = task_generator.taskGeneration_rounded_limited(num_task, utilization)
             tasks = mixed_task_builder.mixed_task_set(tasks, hard_task_factor, fault_rate)
             tasks = mixed_task_builder.pdfForm(tasks)
             if TDAtest(tasks) == 0:
@@ -53,6 +54,7 @@ def main():
             step_size_fault_rate = min(1.0, float(arg))
         if opt in ('-h', '--hard_task_factor'):
             hard_task_factor = float(arg)
+
 
     for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
         print 'Generating: %d tasksets, %d tasks, fault probability: %f \n' % (num_sets, num_tasks, fault_rate)
