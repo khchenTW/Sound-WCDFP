@@ -118,8 +118,7 @@ def sample_inflate_bernoulli(task, a, b):
         return task
     # assume task only has two modes
     for eventL in range(a+1):
-        task['infpdf'].append(((eventL*task['abnormal_exe'] + (a-eventL)*task['execution']), (special.binom(b, eventL)*(task['prob'])**eventL)*(1-task['prob']**(b-eventL))))
-    #print(task['infpdf'])
+        task['infpdf'].append(((eventL*task['abnormal_exe'] + (a-eventL)*task['execution']), (special.binom(b, eventL)*(task['prob'])**eventL)*((1-task['prob'])**(b-eventL))))
     return task
 
 '''
@@ -209,6 +208,8 @@ def optimal_chernoff_taskset_all(taskset, bound, s_min = 0, s_max = 10e100):
         times = findpoints(task, taskset[:i])
         if bound == 'Inflation':
             functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
+        elif bound == 'Original':
+            functions = (logmgf_tasks(taskset[-1], taskset[:-1], time) for time in times)
         else:
             functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
 
@@ -227,6 +228,8 @@ def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
     times = findpoints(taskset[-1], taskset[:-1])
     if bound == 'Inflation':
         functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
+    elif bound == 'Original':
+        functions = (logmgf_tasks(taskset[-1], taskset[:-1], time) for time in times)
     else:
         functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
 

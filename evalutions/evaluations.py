@@ -46,7 +46,7 @@ def main():
             print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
             #for utilization in np.arange(5, 100, 5):
             #for utilization in np.arange(50, 55, 20):
-            for utilization in np.arange(50, 75, 20):
+            for utilization in np.arange(30, 75, 20):
                 try:
                     if ident is not None:
                         filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
@@ -84,7 +84,7 @@ def main():
         print ('Single Thread')
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
             print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
-            for utilization in np.arange(50, 75, 20):
+            for utilization in np.arange(50, 55, 20):
                 try:
                     if ident is not None:
                         filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
@@ -96,13 +96,16 @@ def main():
                             raise Exception("Could not read")
                         
                         # Init lists for storing Calculated DMP
+                        results_ori = []
                         results_carry = []
                         results_inflation = []
                         for taskset in tasksets:
+                            results_ori.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Original'))
                             results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
                             results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
-                        print(results_carry)
-                        print(results_inflation)
+                        #print(results_carry)
+                        #print(results_inflation)
+                        np.save('../results/res_' + filename + '.npy', results_ori)
                         np.save('../results/res_carry_' + filename + '.npy', results_carry)
                         np.save('../results/res_inflation_' + filename + '.npy', results_inflation)
                     else:
