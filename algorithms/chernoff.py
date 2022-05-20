@@ -93,7 +93,7 @@ def sample_inflate_bernoulli_2(task, a, b):
             prob = special.binom(b, eventL) * (task['prob'] ** eventL) * ((1-task['prob']) ** (b-eventL))  # probability of the case
         task['infpdf'].append((val, prob))  # append one entry probability density function
 
-    assert sum(sum([p for v, p in task['infpdf']])) == 1, 'No valid probability density function.'
+    #assert sum(sum([p for v, p in task['infpdf']])) == 1, 'No valid probability density function.'
     return task
 
 '''
