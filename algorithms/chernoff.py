@@ -130,12 +130,12 @@ def sample_inflate_bernoulli_2(task, a, b):
     for eventL in range(a+1):
         val = eventL*task['abnormal_exe'] + (a-eventL)*task['execution']  # inflated value of the random variable for the case
         if eventL == a:
-            prob = 1 - sum([p for v, p in task['inpdf']])  # remaining probability
+            prob = 1 - sum([p for v, p in task['infpdf']])  # remaining probability
         else:
             prob = special.binom(b, eventL) * (task['prob'] ** eventL) * ((1-task['prob']) ** (b-eventL))  # probability of the case
         task['infpdf'].append((val, prob))  # append one entry probability density function
 
-    assert sum(sum([p for v, p in task['inpdf']])) == 1, 'No valid probability density function.'
+    assert sum(sum([p for v, p in task['infpdf']])) == 1, 'No valid probability density function.'
     return task
 
 '''
@@ -258,3 +258,29 @@ def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
     optimal = candidates[np.argmin([x[1] for x in candidates])]
     elapsed_time = time.time() - start_time
     return {'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time}
+
+
+if __name__ == '__main__':
+
+    # counterexample case
+    tsk1 = {
+        'abnormal_exe': 2.5,  # execution time of abnormal case
+        'execution': 1.0,  # regular execution time
+        'prob': 0.1,  # probability of the abnormal case
+        'period': 4,
+        'deadline': 4
+    }
+
+    tsk2 = {
+        'execution': 3.0,
+        'abnormal_exe': 3.0,
+        'prob': 0.0
+    }
+
+    # sample inflate at t=4
+    prob_SAI_t4 = sample_inflate_bernoulli_2(tsk1, math.ceil(4 / tsk1['period']), math.ceil((4+tsk1['deadline'])/tsk1['period']))
+    # should be 1.0 with prob 0.9*0.9 and 2.5 with prob 1-0.9*0.9
+    # and therefore deadline miss with prob 1-0.9*0.9
+    # with carry-in you get guaranteed deadline miss
+    print(prob_SAI_t4)
+    breakpoint()
