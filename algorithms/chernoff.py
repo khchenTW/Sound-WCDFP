@@ -121,6 +121,23 @@ def sample_inflate_bernoulli(task, a, b):
         task['infpdf'].append(((eventL*task['abnormal_exe'] + (a-eventL)*task['execution']), (special.binom(b, eventL)*(task['prob'])**eventL)*((1-task['prob'])**(b-eventL))))
     return task
 
+def sample_inflate_bernoulli_2(task, a, b):
+    task['infpdf'] = list()
+    if a > b:
+        print ("SAI is not applicable here, so no inflation")
+        return task
+    # assume task only has two modes
+    for eventL in range(a+1):
+        val = eventL*task['abnormal_exe'] + (a-eventL)*task['execution']  # inflated value of the random variable for the case
+        if eventL == a:
+            prob = 1 - sum([p for v, p in task['inpdf']])  # remaining probability
+        else:
+            prob = special.binom(b, eventL) * (task['prob'] ** eventL) * ((1-task['prob']) ** (b-eventL))  # probability of the case
+        task['infpdf'].append((val, prob))  # append one entry probability density function
+
+    assert sum(sum([p for v, p in task['inpdf']])) == 1, 'No valid probability density function.'
+    return task
+
 '''
 @method: Generates the log-moment generating function with the inflation method.
 @param task: Task under analysis
