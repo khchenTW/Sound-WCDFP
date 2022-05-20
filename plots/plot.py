@@ -23,33 +23,33 @@ rcParams['pdf.use14corefonts'] = True
 rcParams['text.usetex'] = True
 rcParams["figure.figsize"] = (10,8)
 
-def plot_datasets(datasets, view, utilization):
+def plot_datasets(dataset, view, utilization):
     figlabel = itertools.cycle(('a','b','c','d','e','f','g','h','i'))
     marker = itertools.cycle(('o', 'v','*','D','x','+'))
     colors = itertools.cycle(('c','r','b','g','r','y','y','b'))
     names = []
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    fig.subplots_adjust (top = 0.5, bottom = 0.2, left = 0.1, right = 0.95, hspace = 0.3, wspace=0.05)
-    ax.tick_params(labelcolor = 'w', top = 'on', bottom = 'on', left = 'on', right = 'on')
+    #ax.tick_params(labelcolor = 'w', top = 'on', bottom = 'on', left = 'on', right = 'on')
+    #fig.subplots_adjust (top = 0.5, bottom = 0.2, left = 0.1, right = 0.95, hspace = 0.3, wspace=0.05)
 
     bxinput = []
     ori = []
     carry = []
     inflation = []
-    for dataset in datasets:
-        ori = [val[1] for val in dataset]
-        carry = [val[2] for val in dataset]
-        inflation = [val[3] for val in dataset]
-    print (ori)
+    for inputs in dataset:
+        ori.append(inputs[0])
+        carry.append(inputs[1])
+        inflation.append(inputs[2])
+        #print(inputs)
     bxinput.append(ori)
     bxinput.append(carry)
     bxinput.append(inflation)
-    print (bxinput)
+    #print (bxinput)
 
     ax.set_yscale("log")
-    ax.set_ylabel('Calculated DMP (log-scale)',size=25)
-    ax.tick_params(axis='both', which='major',labelsize=16)
+    ax.set_ylabel('WCDFP (log-scale)',size=20)
+    ax.tick_params(axis='both', which='major',labelsize=12)
     
     labels = ['Original', 'Carry-In', 'Inflation']
     #the blue box
@@ -58,8 +58,6 @@ def plot_datasets(datasets, view, utilization):
     medianprops = dict(linewidth=2.5, color='orange')
     whiskerprops = dict(linewidth=2.5, color='black')
     capprops = dict(linewidth=2.5)
-
-
 
     for tick in ax.xaxis.get_major_ticks():
         tick.label.set_fontsize(25)
@@ -72,7 +70,7 @@ def plot_datasets(datasets, view, utilization):
     except ValueError:
         print ("ValueError")
 
-    box = mpatches.Patch(color='blue', label='First to Third Quartiles', linewidth=3)
+    box = mpatches.Patch(color='blue', label='1st to 3rd Quartiles', linewidth=3)
     av = mpatches.Patch(color='orange', label='Median', linewidth=3)
     whisk = mpatches.Patch(color='black', label='Whiskers', linewidth=3)
     ax.grid()
@@ -130,7 +128,8 @@ def main():
                 results_inflation = np.load('../results/' + filename_inflation + '.npy', allow_pickle=True)
                 if view == 'prob_log':
                     for res_ori, res_carry, res_inflation in zip(results_ori, results_carry, results_inflation):
-                        dataset.append([fault_rate, res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
+                        dataset.append([res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
+                    print(dataset)
 
             except Exception as e:
                 print (e)
@@ -138,9 +137,7 @@ def main():
         else:
             print ('Must specify identifier')
             return
-    datasets.append(dataset)
-
-    plot = plot_datasets(datasets, view, utilization)
+    plot = plot_datasets(dataset, view, utilization)
     save_pdf = PdfPages('./'+ ident + '_' + str(num_tasks) + '_' + str(num_sets)+ '_' + str(view) + '_' +str(utilization)+ '.pdf')
     # save_pdf = PdfPages(ident  + '_' + str(view) + '.pdf')
     save_pdf.savefig(plot, bbox_inches='tight', pad_inches=0.0)
