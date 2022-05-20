@@ -6,5 +6,6 @@
 #python evaluations.py -i rtss -n 10 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 0 -p
 #python evaluations.py -i rtss -n 10 -s 20 -m 0.025 -f 0.025 -h 1.83 -r 0 -p
 #python evaluations.py -i rtss -n 5 -s 10 -m 0.001 -f 0.001 -h 1.83 -r 0
-python evaluations.py -i rtss -n 10 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 0
+#python evaluations.py -i rtss -n 10 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 0
+python evaluations.py -i rtss -n 10 -s 10 -m 0.025 -f 0.025 -h 1 -r 0
 sleep 1
