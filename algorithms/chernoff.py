@@ -112,14 +112,14 @@ def sample_inflate_multi(task, a, b):
 @param b: jobs released over interval + relative deadlines of tasks that are affected by the task i, i.e., i to k-1.
 '''
 def sample_inflate_bernoulli(task, a, b):
+    task['infpdf'] = list()
     if a > b:
         print ("SAI is not applicable here, so no inflation")
         return task
-    #print ('a:'+str(a)+' b:'+str(b))
     # assume task only has two modes
-    task['infpdf'] = list()
-    for eventL in range(a):
+    for eventL in range(a+1):
         task['infpdf'].append(((eventL*task['abnormal_exe'] + (a-eventL)*task['execution']), (special.binom(b, eventL)*(task['prob'])**eventL)*(1-task['prob']**(b-eventL))))
+    #print(task['infpdf'])
     return task
 
 '''
@@ -227,10 +227,6 @@ def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
     times = findpoints(taskset[-1], taskset[:-1])
     if bound == 'Inflation':
         functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
-        #print('Taskset:')
-        #for tsk in taskset:
-            #print(tsk['deadline'])
-            #print(tsk)
     else:
         functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
 

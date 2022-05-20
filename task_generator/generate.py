@@ -62,7 +62,7 @@ def main():
     for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
         print('Generating: %d tasksets, %d tasks, fault probability: %f, rounded: %r' % (num_sets, num_tasks, fault_rate, rounded))
         #for utilization in np.arange(5, 95, 5):
-        for utilization in np.arange(70, 75, 20):
+        for utilization in np.arange(50, 75, 20):
             tasksets = tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_tasks, num_sets, rounded)
             try:
                 if ident is not None:

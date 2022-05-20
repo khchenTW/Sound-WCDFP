@@ -46,7 +46,7 @@ def main():
             print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
             #for utilization in np.arange(5, 100, 5):
             #for utilization in np.arange(50, 55, 20):
-            for utilization in np.arange(70, 75, 20):
+            for utilization in np.arange(50, 75, 20):
                 try:
                     if ident is not None:
                         filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
@@ -67,7 +67,7 @@ def main():
                             freeze_support()
                             p = Pool(5)
                             rel = (p.map(func_star, zip(tasksets,itertools.repeat(max_fault_rate))))
-                        print(rel)
+                        #print(rel)
                         for i in rel:
                             results_carry.append(i[0])
                             results_inflation.append(i[1])
@@ -84,7 +84,7 @@ def main():
         print ('Single Thread')
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
             print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
-            for utilization in np.arange(70, 75, 20):
+            for utilization in np.arange(50, 75, 20):
                 try:
                     if ident is not None:
                         filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
@@ -112,7 +112,7 @@ def main():
         
 
 def insideroutine(taskset, max_fault_rate):
-    print(taskset[0])
+    #print(taskset[0])
     results_carry = []
     results_inflation = []
     
