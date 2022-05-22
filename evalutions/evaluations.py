@@ -6,15 +6,54 @@ import sys, time, getopt
 import numpy as np
 
 sys.path.append('../')
-from algorithms import chernoff
+from algorithms import chernoff, taskConvolution
 
+'''
+@function Task-level convolution approaches:
+'''
+
+def conv_inlined_all(taskset, failure_rate):
+    start_time = time.time()
+    for i in range(1, len(taskset)):
+        probs, states, pruned = [], [], []
+        results_conv = taskConvolution.calculate_prune(taskset[:i], failure_rate, probs, states, pruned)
+    elapsed_time = (time.time() - start_time)
+    return {'ErrProb' : results_conv, 'ms' : elapsed_time}
+
+def conv_inlined_lowest(taskset, failure_rate):
+    start_time = time.time()
+    probs, states, pruned = [], [], []
+    results_conv = taskConvolution.calculate_prune(taskset, failure_rate, probs, states, pruned)
+    elapsed_time = (time.time() - start_time)
+    return {'ErrProb' : results_conv, 'ms' : elapsed_time}
+
+
+'''
+@function this is for parellel version
+'''
 def func_star(a_b):
     #Covert f([a,b,c,d,e,f]) to f(a,b,c,d,e,f) call
     return insideroutine(*a_b)
+'''
+@function this is for parellel version
+'''
+def insideroutine(taskset, max_fault_rate):
+    #print(taskset[0])
+    results_carry = []
+    results_inflation = []
+    
+    print('Computing the chernoff bounds with Carry-in')
+    results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
+    
+    print('Computing the chernoff bounds with Inflation')
+    results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
+    
+    print('DONE!')
+    return [results_carry, results_inflation]
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:m:f:h:r:p", ["ident=", "num_tasks=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded", "parallel"])
+        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:m:f:h:rp", ["ident=", "num_tasks=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded", "parallel"])
     except getopt.GetoptError as err:
         print (str(err))
         sys.exit(2)
@@ -114,19 +153,6 @@ def main():
                     print ('Could not write filename %s' % filename)
         
 
-def insideroutine(taskset, max_fault_rate):
-    #print(taskset[0])
-    results_carry = []
-    results_inflation = []
-    
-    print('Computing the chernoff bounds with Carry-in')
-    results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
-    
-    print('Computing the chernoff bounds with Inflation')
-    results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
-    
-    print('DONE!')
-    return [results_carry, results_inflation]
 
 if __name__=="__main__":
     main()

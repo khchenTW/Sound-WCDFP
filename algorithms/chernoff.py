@@ -106,22 +106,24 @@ def logmgf_tasks_inflation(task, other, interval):
     def logmgf_task(task, interval):
         # Calculate the number of jobs released in the interval
         num_jobs_released = int(math.ceil(float(interval)/task['period']))
+
         # Get the index of task -- if it is in the list of higher priority tasks
         result = np.where(other == task)
         if len(result) > 0 and len(result[0]) > 0:
-            # the task is in hp(\tau_k)
             ind = result[0][0]
-            # Calculate the extended interval
             extInterval = interval + sum(tsk['deadline'] for tsk in other[ind:])
-            # make an inflated task
-            task = sample_inflate_bernoulli_2(task, num_jobs_released, int(math.ceil(float(extInterval)/task['period'])))
-            #print(task['infpdf'])
-
-            # return the mgf form with the inflated task
-            return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['infpdf']) + ')'
         else:
-            # don't do inflation but return the function directly
-            return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['pdf']) + ')'
+            extInterval = interval
+        # Calculate the extended interval
+        # make an inflated task
+        task = sample_inflate_bernoulli_2(task, num_jobs_released, int(math.ceil(float(extInterval)/task['period'])))
+        print('numberReleased: '+str(num_jobs_released))
+        print('window: '+str(int(math.ceil(float(extInterval)/task['period']))))
+        #print(task['infpdf'])
+
+        # return the mgf form with the inflated task
+        return str(num_jobs_released) + '*ln(' + '+'.join(('exp(' + str(event) + '*' + 's' + ')*' + str(probability)) for (event, probability) in task['infpdf']) + ')'
+
     s = symbols('s')
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
     #print(func)
@@ -228,12 +230,16 @@ if __name__ == '__main__':
         'period': 4,
         'deadline': 4
     }
+    tsk1['pdf'] = [(tsk1['execution'], 1-tsk1['prob']), (tsk1['abnormal_exe'], tsk1['prob'])]
 
     tsk2 = {
         'execution': 3.0,
         'abnormal_exe': 3.0,
-        'prob': 0.0
+        'prob': 0.0,
+        'period': 6,
+        'deadline': 6
     }
+    tsk2['pdf'] = [(tsk2['execution'], 1-tsk2['prob']), (tsk2['abnormal_exe'], tsk2['prob'])]
 
     # sample inflate at t=4
     prob_SAI_t4 = sample_inflate_bernoulli_2(tsk1, math.ceil(4 / tsk1['period']), math.ceil((4+tsk1['deadline'])/tsk1['period']))
@@ -241,4 +247,18 @@ if __name__ == '__main__':
     # and therefore deadline miss with prob 1-0.9*0.9
     # with carry-in you get guaranteed deadline miss
     print(prob_SAI_t4)
+
+    #test
+    functions = []
+    functions.append(logmgf_tasks(tsk1, [tsk2], 4))
+    functions.append(logmgf_tasks_inflation(tsk1, [tsk2], 4))
+    functions.append(logmgf_tasks_carry(tsk1, [tsk2], 4))
+    for function in functions:
+        #golden section search
+        candidates = []
+        optimal = goldensectionsearch(function, 0, 10e100)   
+        candidates.append((optimal, function(optimal)))
+        optimal = candidates[np.argmin([x[1] for x in candidates])]
+        print('DFP at t = 4: '+str(min(1.0, mp.exp(str(optimal[1])))))
+
     breakpoint()

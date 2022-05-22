@@ -114,7 +114,6 @@ def main():
             view = str(arg)
 
     datasets = []
-    fault_rate = 0.025
     # for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
     dataset = []
     for num_tasks, num_sets in zip([10], [10]):
@@ -130,6 +129,19 @@ def main():
                     for res_ori, res_carry, res_inflation in zip(results_ori, results_carry, results_inflation):
                         dataset.append([res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
                     print(dataset)
+                if view == 'counter':
+                    counterInflation = 0
+                    counterCarry = 0
+                    same = 0
+                    for res_ori, res_carry, res_inflation in zip(results_ori, results_carry, results_inflation):
+                        if res_carry['ErrProb'] > res_inflation['ErrProb']:
+                            counterInflation +=1
+                        elif res_inflation['ErrProb'] > res_carry['ErrProb']:
+                            counterCarry +=1
+                        else:
+                            same +=1
+                    print ('Inflation-Win: '+ str(counterInflation) + ' Carry-Win: ' + str(counterCarry) + ' BothSame: '+str(same))
+
 
             except Exception as e:
                 print (e)
