@@ -117,8 +117,8 @@ def logmgf_tasks_inflation(task, other, interval):
         # Calculate the extended interval
         # make an inflated task
         task = sample_inflate_bernoulli_2(task, num_jobs_released, int(math.ceil(float(extInterval)/task['period'])))
-        print('numberReleased: '+str(num_jobs_released))
-        print('window: '+str(int(math.ceil(float(extInterval)/task['period']))))
+        #print('numberReleased: '+str(num_jobs_released))
+        #print('window: '+str(int(math.ceil(float(extInterval)/task['period']))))
         #print(task['infpdf'])
 
         # return the mgf form with the inflated task

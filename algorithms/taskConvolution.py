@@ -146,11 +146,11 @@ def convolution(tasks, prob_abnormal, probabilties, states):
     all_times = all_releases(tasks, deadline)
     distri = empty_distri()
     t = 0.0
-    print 'releases: ' + repr(len(releases))
-    print 'states: ' + repr(math.pow(2,len(releases)))
+    #print 'releases: ' + repr(len(releases))
+    #print 'states: ' + repr(math.pow(2,len(releases)))
     while (t < deadline):
         i = 0
-        print len(distri)
+        #print len(distri)
         job = releases[0]
         while(job[0]['time']== t):
             distri = convolute(distri, job)

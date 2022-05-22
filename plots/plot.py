@@ -116,11 +116,11 @@ def main():
     datasets = []
     # for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
     dataset = []
-    for num_tasks, num_sets in zip([10], [10]):
+    for num_tasks, num_sets in zip([2, 3, 5], [20]):
         if ident is not None:
-            filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
-            filename_carry = 'res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
-            filename_inflation = 'res_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
+            filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
+            filename_carry = 'res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
+            filename_inflation = 'res_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
             try:
                 results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
                 results_carry = np.load('../results/' + filename_carry + '.npy', allow_pickle=True)
@@ -139,8 +139,8 @@ def main():
                         elif res_inflation['ErrProb'] > res_carry['ErrProb']:
                             counterCarry +=1
                         else:
-                            same +=1
-                    print ('Inflation-Win: '+ str(counterInflation) + ' Carry-Win: ' + str(counterCarry) + ' BothSame: '+str(same))
+                            same +=1                    
+                    print ('BestU: '+str(utilization)+' Fault Rate: '+str(max_fault_rate)+' X: '+ str(hard_task_factor) + ' Inflation-Win: '+ str(counterInflation) + ' Carry-Win: ' + str(counterCarry) + ' BothSame: '+str(same))
 
 
             except Exception as e:

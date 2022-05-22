@@ -6,12 +6,15 @@ import sys, time, getopt
 import numpy as np
 
 sys.path.append('../')
-from algorithms import chernoff, taskConvolution
+#from algorithms import chernoff, taskConvolution
+from algorithms import chernoff
 
 '''
-@function Task-level convolution approaches:
+@function Task-level convolution approaches
+@parm taskset: for analysis
+@parm failure_rate: rate of two modes
 '''
-
+'''
 def conv_inlined_all(taskset, failure_rate):
     start_time = time.time()
     for i in range(1, len(taskset)):
@@ -26,7 +29,7 @@ def conv_inlined_lowest(taskset, failure_rate):
     results_conv = taskConvolution.calculate_prune(taskset, failure_rate, probs, states, pruned)
     elapsed_time = (time.time() - start_time)
     return {'ErrProb' : results_conv, 'ms' : elapsed_time}
-
+'''
 
 '''
 @function this is for parellel version
@@ -126,7 +129,7 @@ def main():
             for utilization in np.arange(30, 75, 20):
                 try:
                     if ident is not None:
-                        filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
+                        filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
 
                         # Load the generated tasksets
                         try:
