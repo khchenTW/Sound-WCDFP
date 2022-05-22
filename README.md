@@ -47,25 +47,23 @@ pip3 install matplotlib numpy scipy sympy
 ```
 or
 ```
-python3.9 -m pip install matplotlib numpy scipy sympy
+python3.10 -m pip install matplotlib numpy scipy sympy
 ```
 In case any dependent packages are missing, please install them accordingly. 
 
 According to the feedback of one reviewer, Python 3.10 might not require all dependncies listed above.
 
-## File Structure (Need to update)
+## File Structure
     .
-    ├── res                     # Resource packages
-    │   ├── benchmark.py        # Server and task creation
-    │   ├── our_analysis.py     # Our analysis
-    │   ├── plot.py             # Plotting functionality
-    │   └── rtc_cb.py           # RTC-based analysis	
-    ├── data                    # Evaluation data
-    │   ├── 1setup              # Server and task specification
-    │   ├── 2results            # Evaluation results
-    │   └── 3plots              # Plots to present the results
-    ├── main.py                 # Main function of the evaluation
-    ├── auto.sh                 # bash-script to automize the evaluation
+    ├── algorithms              # Resource packages
+    │   ├── chernoff.py         # DATE'19 Optimized Chernoff Bound approach
+    │   ├── task_convolution.py # ECRTS'18 Task-level convlution methods
+    │   └── TDA.py              # Time-demand analysis routines	
+    ├── evaluations             # Evaluation scripts
+    ├── plots                   # Plotter and Plots 
+    ├── results                 # Results of Evaluations
+    ├── task_generator          # Taskset Generator
+    ├── tasksets                # Generated Tasksets
     └── README.md
 
 ### Deployment (Need to Update)
@@ -74,38 +72,33 @@ The following steps explain how to deploy this framework on a common PC:
 
 First, clone the git repository or download the [zip file]():
 ```
-git clone https://github.com/kuanhsunchen/CBOpt.git
+git clone https://github.com/kuanhsunchen/SafeCB.git
 ```
-Move into the extracted/cloned folder, change the permissions of the script to be executable, and execute auto.sh natively:
+Move into the extracted/cloned folder, change the permissions of the script to be executable, and generate tasksets:
 ```
-cd CBOpt/evaluations
+cd SafeCB/task_generator
+chmod 777 generate.sh
+./generate.sh
+```
+
+execute:
+```
+cd SafeCB/evaluations
 chmod 777 evaluate.sh
 ./evaluate.sh
+```
+and plot:
+```
+cd SafeCB/plots
+chmod 777 plot.sh
+./plot.sh
 ```
 ## How to run the experiments  (Need to Update)
 
 - To reproduce the figures in the paper, ```./evaluate.sh``` should be executed.
-- The plotted figures can be found in the folder plots:
-
-Paper figure | Plot in data/3plots
----|---
- | 
+- The plotted figures can be found in the folder plots.
 
 As a reference, we utilize a machine running Archlinux 5.17.3-arch1-1 x86_64 GNU/Linux,with i7-10610U CPU and 16 GB main memory. 
-
-## Overview of the corresponding functions  (Need to Update)
-
-The following tables describe the mapping between content of our paper and the source code in this repository.
-
-**Section 4.1** (RTC-based analysis):
-On Paper | Source code
---- | ---
-Theorem 4 | rtc_cb.wcrt_analysis_single()
-
-**Section 4.2** (Our Analysis for Sporadic Tasks):
-On Paper | Source code
---- | ---
-Theorem 7 | our_analysis.wcrt_analysis_single()
 
 ## Miscellaneous
 
