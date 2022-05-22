@@ -5,14 +5,42 @@ multinomial representations of tasks the convolution based approach is implement
 in this file as well. '''
 
 from __future__ import division
+from importlib.metadata import distribution
 import random
 import math
+from tkinter import W
 import numpy as np
 from operator import itemgetter, attrgetter
 from pkg_resources import get_distribution
 
 import TDA
 
+''' Calculates the probability of deadline miss with safe upper bounds (Carry-in or inflation)
+
+'tasks represents' the given task set,
+'prob_abnormal' the probability of abnormal execution, i.e., higher WCET.
+'probabilities' tracks the calculated probabilities for each time point
+'states' tracks the number of states considered for each time point '''
+
+def calculate_safe(tasks, prob_abnormal, probabilties, states, bound):
+    tasks = sort(tasks, 'deadline', False)
+    deadline = tasks[len(tasks)-1]['deadline']
+    min_time = TDA.min_time(tasks, 'execution')
+    tasks = sort(tasks, 'execution', True)
+    all_times = all_releases(tasks, deadline)
+    times = []
+    for i in all_times:
+        if i > min_time:
+            times.append(i)
+    times.sort()
+    for time in times:
+        prob = calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound)
+        probabilties.append(prob)
+    probability = 1
+    for i in range(0, len(times),1):
+        if (probabilties[i]<probability):
+            probability = probabilties[i]
+    return probability
 
 ''' Calculates the probability of deadline miss as detailed in Section 5.
 All job releases of higher priority tasks are considered.
@@ -215,6 +243,34 @@ def convolution_merge(tasks, prob_abnormal, probabilties, states, pruned):
     return probability
 
 ''' Calculates the deadline miss probability for a given point in time'''
+def calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound):
+    order = sort(tasks, 'execution', True)
+    distributions = []
+    if bound == 'Carryin':
+        for task in order:
+            distributions.append(get_distribution_carryin(task, time, prob_abnormal))
+    else:
+        # Generates the binomial distribution of the tasks        
+        for task in order:
+            result = np.where(tasks == task)
+            if len(result) > 0 and len(result[0]) > 0:
+                ind = result[0][0]
+                exttime = time + sum(tsk['deadline'] for tsk in task[ind:])
+            else:
+                exttime = time
+            distributions.append(get_distribution_inflation(task, time, exttime, prob_abnormal))
+    print("Exact Distributions: ")
+    print(distributions)
+    # creates an empty distribution as starting point for the convolution
+    distri = empty_distri()
+    # successively convolutes the starting distribution with the
+    for i in range(0,len(distributions),1):
+        distri = convolute(distri, distributions[i])
+    prob =  calculate_miss_prob(distri, time)
+    states.append(len(distri))
+    return prob
+
+''' Calculates the deadline miss probability for a given point in time'''
 def calculate_probabiltiy(tasks, time, prob_abnormal, states):
     order = sort(tasks, 'execution', True)
     distributions = []
@@ -322,6 +378,35 @@ def calculate_probabiltiy_prune_reduct(tasks, time, prob_abnormal, states, prune
         pruned_states.append(max_num_states)
         states.append(max_states)
         return prob
+
+# calculates the binomial distribution with the inflated pdf
+def get_distribution_inflation(task, time, exttime, prob_abnormal):
+    distribution = []    
+    a = math.ceil(time/task['deadline'])
+    b = math.ceil(exttime/task['deadline'])
+    for k in range(0, int(a) + 1, 1):
+        pair={}
+        pair['misses']=k        
+            
+        if k == a:            
+            pair['prob'] = 1 - sum([p['prob'] for p in distribution])
+        else:
+            pair['prob'] = (math.factorial(b)/(math.factorial(k)*math.factorial(b-k)))*math.pow(prob_abnormal, k)*math.pow((1-prob_abnormal),(b-k))
+        pair['execution']=k*task['abnormal_exe']+(a-k)*task['execution']
+        distribution.append(pair)
+    return distribution
+
+# calculates the binomial distribution with carryin
+def get_distribution_carryin(task, time, prob_abnormal):
+    distribution = []    
+    n = math.ceil(time+task['deadline']/task['deadline'])
+    for k in range(0, int(n) + 1, 1):
+        pair={}
+        pair['misses']=k
+        pair['prob']= (math.factorial(n)/(math.factorial(k)*math.factorial(n-k)))*math.pow(prob_abnormal, k)*math.pow((1-prob_abnormal),(n-k))
+        pair['execution']=k*task['abnormal_exe']+(n-k)*task['execution']
+        distribution.append(pair)
+    return distribution
 
 # calculates the binomial distribution for a given task, time, and probability of abnormal execution
 def get_distribution(task, time, prob_abnormal):

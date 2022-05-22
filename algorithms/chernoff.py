@@ -24,6 +24,9 @@ import os
 import math
 import heapq
 import itertools
+import taskConvolution
+import sort_task_set
+import TDA
 
 def findpoints(task, higher_priority_tasks, mode = 0):
     points = []
@@ -246,9 +249,19 @@ if __name__ == '__main__':
     # should be 1.0 with prob 0.9*0.9 and 2.5 with prob 1-0.9*0.9
     # and therefore deadline miss with prob 1-0.9*0.9
     # with carry-in you get guaranteed deadline miss
-    print(prob_SAI_t4)
+    #print(prob_SAI_t4)
+    
+    # test with exact convolution 
+    allTasks = []
+    allTasks.append(tsk1) 
+    allTasks.append(tsk2) 
+    probability = taskConvolution.calculate_safe(allTasks, tsk1['prob'], [], [], 'Carryin')
+    print('DFP under Carry-in: '+str(probability))
+    probability = taskConvolution.calculate_safe(allTasks, tsk1['prob'], [], [], 'Inflation')
+    print('DFP under Inflation: '+str(probability))
 
-    #test
+    # test with CB approach -> mgf in log form is the inputs
+    '''
     functions = []
     functions.append(logmgf_tasks(tsk1, [tsk2], 4))
     functions.append(logmgf_tasks_inflation(tsk1, [tsk2], 4))
@@ -260,5 +273,5 @@ if __name__ == '__main__':
         candidates.append((optimal, function(optimal)))
         optimal = candidates[np.argmin([x[1] for x in candidates])]
         print('DFP at t = 4: '+str(min(1.0, mp.exp(str(optimal[1])))))
-
-    breakpoint()
+    '''
+    #breakpoint()
