@@ -116,7 +116,8 @@ def main():
     datasets = []
     # for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
     dataset = []
-    for num_tasks, num_sets in zip([2, 3, 5], [20]):
+
+    for num_tasks, num_sets in zip([2, 3, 5], [20, 20, 20]):
         if ident is not None:
             filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
             filename_carry = 'res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
@@ -128,7 +129,13 @@ def main():
                 if view == 'prob_log':
                     for res_ori, res_carry, res_inflation in zip(results_ori, results_carry, results_inflation):
                         dataset.append([res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
-                    print(dataset)
+                    #print(dataset)
+                    plot = plot_datasets(dataset, view, utilization)
+                    save_pdf = PdfPages('./'+ ident + '_' + str(num_tasks) + '_' + str(num_sets)+ '_' + str(view) + '_' +str(utilization)+ '_'+str(hard_task_factor)+'_'+str(max_fault_rate)+'.pdf')
+                    # save_pdf = PdfPages(ident  + '_' + str(view) + '.pdf')
+                    save_pdf.savefig(plot, bbox_inches='tight', pad_inches=0.0)
+                    save_pdf.close()
+
                 if view == 'counter':
                     counterInflation = 0
                     counterCarry = 0
@@ -140,8 +147,7 @@ def main():
                             counterCarry +=1
                         else:
                             same +=1                    
-                    print ('BestU: '+str(utilization)+' Fault Rate: '+str(max_fault_rate)+' X: '+ str(hard_task_factor) + ' Inflation-Win: '+ str(counterInflation) + ' Carry-Win: ' + str(counterCarry) + ' BothSame: '+str(same))
-
+                    print ('BestU: '+str(utilization)+' TasksPerSet:'+str(num_tasks) +' Fault Rate: '+str(max_fault_rate)+' X: '+ str(hard_task_factor) + ' Inflation-Win: '+ str(counterInflation) + ' Carry-Win: ' + str(counterCarry) + ' BothSame: '+str(same))
 
             except Exception as e:
                 print (e)
@@ -149,11 +155,6 @@ def main():
         else:
             print ('Must specify identifier')
             return
-    plot = plot_datasets(dataset, view, utilization)
-    save_pdf = PdfPages('./'+ ident + '_' + str(num_tasks) + '_' + str(num_sets)+ '_' + str(view) + '_' +str(utilization)+ '.pdf')
-    # save_pdf = PdfPages(ident  + '_' + str(view) + '.pdf')
-    save_pdf.savefig(plot, bbox_inches='tight', pad_inches=0.0)
-    save_pdf.close()
-
+        
 if __name__=="__main__":
     main()

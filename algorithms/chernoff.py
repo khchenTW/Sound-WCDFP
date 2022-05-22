@@ -236,8 +236,8 @@ if __name__ == '__main__':
         'execution': 3.0,
         'abnormal_exe': 3.0,
         'prob': 0.0,
-        'period': 6,
-        'deadline': 6
+        'period': 4.4,
+        'deadline': 4.4
     }
     tsk2['pdf'] = [(tsk2['execution'], 1-tsk2['prob']), (tsk2['abnormal_exe'], tsk2['prob'])]
 

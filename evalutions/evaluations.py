@@ -125,8 +125,8 @@ def main():
         # single thread version
         print ('Single Thread')
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
-            print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
             for utilization in np.arange(30, 75, 20):
+                print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, U: %d' % (num_sets, num_tasks, fault_rate, rounded, utilization))
                 try:
                     if ident is not None:
                         filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
