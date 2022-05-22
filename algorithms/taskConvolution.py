@@ -23,19 +23,22 @@ import TDA
 'probabilities' tracks the calculated probabilities for each time point
 'states' tracks the number of states considered for each time point '''
 
-def calculate_safe(tasks, prob_abnormal, probabilties, states, bound):
-    tasks = sort(tasks, 'deadline', False)
+def calculate_safe(tasks, prob_abnormal, probabilties, states, bound, sortedList=False):
+    if sortedList == True:
+        tasks = sort(tasks, 'deadline', False)
+    # suppose that we are checking for the last index task
     deadline = tasks[len(tasks)-1]['deadline']
     min_time = TDA.min_time(tasks, 'execution')
-    tasks = sort(tasks, 'execution', True)
+    if sortedList == True:
+        tasks = sort(tasks, 'execution', True)
     all_times = all_releases(tasks, deadline)
     times = []
-    times.append(4)
-    #times.append(4.4)
-    #for i in all_times:
-    #    if i > min_time:
-    #        times.append(i)
-    #times.sort()
+    for i in all_times:
+       if i >= min_time:
+           times.append(i)
+    times.sort()
+    # print('Time Points:')
+    # print(times)
     for time in times:
         prob = calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound)
         probabilties.append(prob)
@@ -246,26 +249,38 @@ def convolution_merge(tasks, prob_abnormal, probabilties, states, pruned):
     return probability
 
 ''' Calculates the deadline miss probability for a given point in time'''
-def calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound):    
-    order = sort(tasks, 'period', True)    
+def calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, sortedList=False):  
+    if sortedList == True:  
+        order = sort(tasks, 'period', True) 
+    else:
+        order = tasks   
     distributions = []
     if bound == 'Carryin':
-        for task in order:
-            distributions.append(get_distribution_carryin(task, time, prob_abnormal))
+        for task in order:            
+            if task == order[len(order)-1]:
+                # if this is the lowest priority task k                
+                distributions.append(get_distribution(task, time, prob_abnormal))
+            else:    
+                distributions.append(get_distribution_carryin(task, time, prob_abnormal))            
     elif bound == 'Inflation':        
         # Generates the binomial distribution of the tasks        
-        for task in order:            
-            tasks = sort(tasks, 'deadline', False)
-            saiTasks = []
-            flag = False
-            for i in range(0, len(tasks)-1, 1):
-                if tasks[i] == task:
-                    flag = True
-                if flag == True:
-                    saiTasks.append(tasks[i]) 
-            exttime = sum(tsk['deadline'] for tsk in saiTasks)            
-            #print (exttime)
-            distributions.append(get_distribution_inflation(task, time, exttime, prob_abnormal))
+        for task in order:         
+            if task == order[len(order)-1]:
+                # if this is the lowest priority task k
+                distributions.append(get_distribution(task, time, prob_abnormal))   
+            else:
+                if sortedList == True:
+                    tasks = sort(tasks, 'deadline', False)
+                saiTasks = []
+                flag = False
+                for i in range(0, len(tasks)-1, 1):
+                    if tasks[i] == task:
+                        flag = True
+                    if flag == True:
+                        saiTasks.append(tasks[i]) 
+                exttime = sum(tsk['deadline'] for tsk in saiTasks)            
+                #print (exttime)            
+                distributions.append(get_distribution_inflation(task, time, exttime, prob_abnormal))
     #print("Exact Distributions: ")
     #print(distributions)
     # creates an empty distribution as starting point for the convolution
@@ -406,7 +421,7 @@ def get_distribution_inflation(task, time, exttime, prob_abnormal):
 # calculates the binomial distribution with carryin
 def get_distribution_carryin(task, time, prob_abnormal):
     distribution = []    
-    n = math.ceil(time+task['deadline']/task['deadline'])
+    n = math.ceil((time+task['deadline'])/task['deadline'])
     for k in range(0, int(n) + 1, 1):
         pair={}
         pair['misses']=k

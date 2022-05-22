@@ -225,7 +225,8 @@ def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
 
 if __name__ == '__main__':
 
-    # counterexample case
+    # counterexample case 1
+    '''
     tsk1 = {
         'abnormal_exe': 2.5,  # execution time of abnormal case
         'execution': 1.0,  # regular execution time
@@ -244,6 +245,12 @@ if __name__ == '__main__':
     }
     tsk2['pdf'] = [(tsk2['execution'], 1-tsk2['prob']), (tsk2['abnormal_exe'], tsk2['prob'])]
 
+    allTasks = []
+    allTasks.append(tsk1) 
+    allTasks.append(tsk2) 
+    allTasks.append(tsk3) 
+
+    '''
     # sample inflate at t=4
     #prob_SAI_t4 = sample_inflate_bernoulli_2(tsk1, math.ceil(4 / tsk1['period']), math.ceil((4+tsk1['deadline'])/tsk1['period']))
     # should be 1.0 with prob 0.9*0.9 and 2.5 with prob 1-0.9*0.9
@@ -251,10 +258,40 @@ if __name__ == '__main__':
     # with carry-in you get guaranteed deadline miss
     #print(prob_SAI_t4)
     
-    # test with exact convolution 
+    # counterexample case 2
+    tsk1 = {
+        'abnormal_exe': 2.0,  # execution time of abnormal case
+        'execution': 0.2,  # regular execution time
+        'prob': 0.1,  # probability of the abnormal case
+        'period': 2,
+        'deadline': 2
+    }
+    tsk1['pdf'] = [(tsk1['execution'], 1-tsk1['prob']), (tsk1['abnormal_exe'], tsk1['prob'])]
+
+    tsk2 = {
+        'execution': 0.2,
+        'abnormal_exe': 10.0,
+        'prob': 0.1,
+        'period': 10,
+        'deadline': 10
+    }
+    tsk2['pdf'] = [(tsk2['execution'], 1-tsk2['prob']), (tsk2['abnormal_exe'], tsk2['prob'])]
+
+    tsk3 = {
+        'execution': 1.0,
+        'abnormal_exe': 1.0,
+        'prob': 0.0,
+        'period': 2,
+        'deadline': 2
+    }
+    tsk3['pdf'] = [(tsk3['execution'], 1-tsk3['prob']), (tsk3['abnormal_exe'], tsk3['prob'])]
+
     allTasks = []
     allTasks.append(tsk1) 
     allTasks.append(tsk2) 
+    allTasks.append(tsk3) 
+    
+    # test with exact convolution 
     probability = taskConvolution.calculate_safe(allTasks, tsk1['prob'], [], [], 'Carryin')
     print('DFP under Carry-in: '+str(probability))
     probability = taskConvolution.calculate_safe(allTasks, tsk1['prob'], [], [], 'Inflation')
