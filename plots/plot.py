@@ -21,7 +21,7 @@ rcParams['font.sans-serif'] = ['Tahoma']
 rcParams['ps.useafm'] = True
 rcParams['pdf.use14corefonts'] = True
 rcParams['text.usetex'] = True
-rcParams["figure.figsize"] = (8,10)
+rcParams["figure.figsize"] = (12,10)
 
 def plot_datasets(dataset, view, utilization):
     figlabel = itertools.cycle(('a','b','c','d','e','f','g','h','i'))
@@ -34,14 +34,20 @@ def plot_datasets(dataset, view, utilization):
 
     bxinput = []
     ori = []
+    conv_carry = []
+    conv_inflation = []
     carry = []
     inflation = []
     for inputs in dataset:
-        ori.append(inputs[0])
-        carry.append(inputs[1])
-        inflation.append(inputs[2])
+        #ori.append(inputs[0])
+        conv_carry.append(inputs[0])
+        conv_inflation.append(inputs[1])
+        carry.append(inputs[2])
+        inflation.append(inputs[3])
         #print(inputs)
-    bxinput.append(ori)
+    #bxinput.append(ori)
+    bxinput.append(conv_carry)
+    bxinput.append(conv_inflation)
     bxinput.append(carry)
     bxinput.append(inflation)
     #print (bxinput)
@@ -50,8 +56,8 @@ def plot_datasets(dataset, view, utilization):
     ax.set_ylabel('WCDFP (log-scale)',size=20)
     ax.tick_params(axis='both', which='major',labelsize=12)
     
-    labels = ['Original', 'Carry-In', 'Inflation']
-    #labels = ['Original', 'Carry-In']
+    #labels = ['Original', 'Carry-In', 'Inflation']
+    labels = ['Conv-CarryIn','Conv-Inflation', 'CarryIn', 'Inflation']
     #the blue box
     boxprops = dict(linewidth=2, color='blue')
     #the median line
@@ -117,19 +123,23 @@ def main():
     # for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
     dataset = []
 
+    #for num_tasks, num_sets in zip([2, 3, 5], [20, 20, 20]):
     for num_tasks, num_sets in zip([2, 3, 5], [20, 20, 20]):
         if ident is not None:
-            filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
+            #filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
             filename_carry = 'res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
             filename_inflation = 'res_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+            filename_conv_carry = 'res_conv_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+            filename_conv_inflation = 'res_conv_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
             try:
-                results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
+                #results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
+                results_conv_inflation = np.load('../results/' + filename_conv_inflation + '.npy', allow_pickle=True)
+                results_conv_carry = np.load('../results/' + filename_conv_carry + '.npy', allow_pickle=True)
                 results_carry = np.load('../results/' + filename_carry + '.npy', allow_pickle=True)
                 results_inflation = np.load('../results/' + filename_inflation + '.npy', allow_pickle=True)
                 if view == 'prob_log':
-                    for res_ori, res_carry, res_inflation in zip(results_ori, results_carry, results_inflation):
-                        dataset.append([res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
-                    #print(dataset)
+                    for res_carry, res_inflation, res_conv_carry, res_conv_inflation in zip(results_carry, results_inflation, results_conv_carry, results_conv_inflation):
+                        dataset.append([res_conv_carry, res_conv_inflation, res_carry['ErrProb'], res_inflation['ErrProb']])
                     plot = plot_datasets(dataset, view, utilization)
                     save_pdf = PdfPages('./'+ ident + '_' + str(num_tasks) + '_' + str(num_sets)+ '_' + str(view) + '_' +str(utilization)+ '_'+str(hard_task_factor)+'_'+str(max_fault_rate)+'.pdf')
                     # save_pdf = PdfPages(ident  + '_' + str(view) + '.pdf')
@@ -140,9 +150,10 @@ def main():
                     counterInflation = 0
                     counterCarry = 0
                     same = 0
-                    for res_ori, res_carry, res_inflation in zip(results_ori, results_carry, results_inflation):
+                    for res_carry, res_inflation, res_conv_carry, res_conv_inflation in zip(results_carry, results_inflation, results_conv_carry, results_conv_inflation):
                         if res_carry['ErrProb'] > res_inflation['ErrProb']:
                             counterInflation +=1
+                            print('Res: carry'+str(res_carry['ErrProb'])+' inflation'+str(res_inflation['ErrProb']))
                         elif res_inflation['ErrProb'] > res_carry['ErrProb']:
                             counterCarry +=1
                         else:

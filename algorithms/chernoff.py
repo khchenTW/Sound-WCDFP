@@ -24,9 +24,6 @@ import os
 import math
 import heapq
 import itertools
-import taskConvolution
-import sort_task_set
-import TDA
 
 def findpoints(task, higher_priority_tasks, mode = 0):
     points = []
@@ -224,6 +221,10 @@ def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
 
 
 if __name__ == '__main__':
+
+    import taskConvolution
+    import sort_task_set
+    import TDA
 
     # counterexample case 1
     '''

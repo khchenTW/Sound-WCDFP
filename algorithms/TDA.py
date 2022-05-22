@@ -33,6 +33,22 @@ def min_time(tasks, criteria, numD=1):
 def Workload_Contrained(T,C,t):
     return C*math.ceil((t)/T)
 
+def TDAWorst(task,HPTasks):
+    C=task['abnormal_exe']
+    R=C
+    D=task['deadline']
+
+    while True:
+        I=0
+        for itask in HPTasks:
+            I=I+Workload_Contrained(itask['period'], itask['abnormal_exe'],R)
+        if R>D:
+            return R
+        if R < I+C:
+            R=I+C
+        else:
+            return R
+
 def TDA(task,HPTasks):
     C=task['execution']
     R=C
@@ -48,6 +64,18 @@ def TDA(task,HPTasks):
             R=I+C
         else:
             return R
+def TDAtestWorst(tasks):
+    x = 0
+    fail = 0
+    for i in tasks:
+        hpTasks = tasks[:x]
+        RT=TDAWorst(i, hpTasks)
+        if RT > i['deadline']:
+            fail = 1
+            break
+        #after this for loop, fail should be 0
+        x+=1
+    return fail
 
 def TDAtest(tasks):
     x = 0

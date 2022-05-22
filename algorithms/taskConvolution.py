@@ -9,12 +9,14 @@ from importlib.metadata import distribution
 from pickle import FALSE
 import random
 import math
+import sys
 from tkinter import W
 import numpy as np
 from operator import itemgetter, attrgetter
 from pkg_resources import get_distribution
 
-import TDA
+sys.path.append('../')
+from algorithms import TDA
 
 ''' Calculates the probability of deadline miss with safe upper bounds (Carry-in or inflation)
 
@@ -39,13 +41,17 @@ def calculate_safe(tasks, prob_abnormal, probabilties, states, bound, sortedList
     times.sort()
     # print('Time Points:')
     # print(times)
+    print('Fail in Worst?:'+str(TDA.TDAtestWorst(tasks)))
     for time in times:
-        prob = calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound)
+        prob = calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, False)
+        #print(prob)
         probabilties.append(prob)
     probability = 1
     for i in range(0, len(times),1):
         if (probabilties[i]<probability):
             probability = probabilties[i]
+    # print('Bound'+str(bound))
+    # print(probability)
     return probability
 
 ''' Calculates the probability of deadline miss as detailed in Section 5.
@@ -288,8 +294,10 @@ def calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, sorted
     # successively convolutes the starting distribution with the
     for i in range(0,len(distributions),1):
         distri = convolute(distri, distributions[i])
+    distri = collapse(distri)
     prob =  calculate_miss_prob(distri, time)
-    states.append(len(distri))
+    #print(prob)
+    # states.append(len(distri))
     return prob
 
 ''' Calculates the deadline miss probability for a given point in time'''
