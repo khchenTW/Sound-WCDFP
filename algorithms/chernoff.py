@@ -245,7 +245,7 @@ if __name__ == '__main__':
     tsk2['pdf'] = [(tsk2['execution'], 1-tsk2['prob']), (tsk2['abnormal_exe'], tsk2['prob'])]
 
     # sample inflate at t=4
-    prob_SAI_t4 = sample_inflate_bernoulli_2(tsk1, math.ceil(4 / tsk1['period']), math.ceil((4+tsk1['deadline'])/tsk1['period']))
+    #prob_SAI_t4 = sample_inflate_bernoulli_2(tsk1, math.ceil(4 / tsk1['period']), math.ceil((4+tsk1['deadline'])/tsk1['period']))
     # should be 1.0 with prob 0.9*0.9 and 2.5 with prob 1-0.9*0.9
     # and therefore deadline miss with prob 1-0.9*0.9
     # with carry-in you get guaranteed deadline miss
