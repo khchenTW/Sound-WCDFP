@@ -95,7 +95,7 @@ def CSet_generate_rounded(Pmin,numLog):
         PSet.append(pair)
         j=j+1;
 
-def CSet_generate_rounded_limited(Pmin,numLog):
+def CSet_generate_limited(Pmin,numLog):
     global USet,PSet
     j=0
     for i in USet:
@@ -136,4 +136,10 @@ def taskGeneration_rounded(numTasks,uTotal):
     CSet_generate_rounded(10,2)
     return PSet
 
+def taskGeneration_limited(numTasks,uTotal):
+    random.seed()
+    init()
+    UUniFast(numTasks,uTotal/100)
+    CSet_generate_limited(10,2)
+    return PSet
 

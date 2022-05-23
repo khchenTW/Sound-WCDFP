@@ -125,7 +125,8 @@ def main():
         # single thread version
         print ('Single Thread')
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
-            for utilization in np.arange(30, 55, 20):
+            for utilization in np.arange(50, 55, 20):
+            #for utilization in np.arange(90, 95, 20):
                 print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, U: %d' % (num_sets, num_tasks, fault_rate, rounded, utilization))
                 try:
                     if ident is not None:
@@ -143,21 +144,47 @@ def main():
                         results_conv_inflation = []
                         results_carry = []
                         results_inflation = []
+                        conv_carry = 0
+                        conv_inflation = 0
+                        same = 0
                         for taskset in tasksets:
+                            #The following is for counting
+                            '''
+                            DFPCarry= taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Carryin', True)
+                            DFPInflation= taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Inflation', True)
+                            CBCarry = chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry')
+                            CBInflation = chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation')
+                            if DFPCarry < DFPInflation:
+                                conv_carry +=1
+                            elif DFPCarry > DFPInflation:
+                                conv_inflation +=1
+                                print (DFPCarry)
+                                print (DFPInflation)
+                                print (CBCarry)
+                                print (CBInflation)
+                            else:
+                                same +=1
+                            
+                        print ('BestU: '+str(utilization)+' TasksPerSet:'+str(num_tasks) +' Fault Rate: '+str(max_fault_rate)+' X: '+ str(hard_task_factor) + ' Inflation-Win: '+ str(conv_inflation) + ' Carry-Win: ' + str(conv_carry) + ' BothSame: '+str(same))
+                            #The following is for evaluation
+                        #print ('BestU: '+str(utilization)+' TasksPerSet:'+str(num_tasks) +' Fault Rate: '+str(max_fault_rate)+' X: '+ str(hard_task_factor) + ' Inflation-Win: '+ str(counterInflation) + ' Carry-Win: ' + str(counterCarry) + ' BothSame: '+str(same))
+                            '''
+                            #The following is for evaluation
+
                             #results_ori.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Original'))
                             # Be aware of the scalbility issue
-                            #results_conv_carry.append(taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Carryin', True))
+                            results_conv_carry.append(taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Carryin', True))
                             results_conv_inflation.append(taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Inflation', True))
-
-                            #results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
-                            #results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
+                            
+                            results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
+                            results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
                         #print(results_carry)
                         #print(results_inflation)
                         #np.save('../results/res_' + filename + '.npy', results_ori)
-                        #np.save('../results/res_conv_carry_' + filename + '.npy', results_conv_carry)
-                        #np.save('../results/res_conv_inflation_' + filename + '.npy', results_conv_inflation)
-                        #np.save('../results/res_carry_' + filename + '.npy', results_carry)
-                        #np.save('../results/res_inflation_' + filename + '.npy', results_inflation)
+                        np.save('../results/res_conv_carry_' + filename + '.npy', results_conv_carry)
+                        np.save('../results/res_conv_inflation_' + filename + '.npy', results_conv_inflation)
+                        np.save('../results/res_carry_' + filename + '.npy', results_carry)
+                        np.save('../results/res_inflation_' + filename + '.npy', results_inflation)
                     else:
                         raise Exception("Please specify an identifier!")
                 except IOError:

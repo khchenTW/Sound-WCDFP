@@ -17,10 +17,12 @@ from algorithms import TDA
  @param num_sets: Number of generated tasksets
 '''
 
-def tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_task, num_sets, rounded):
+def tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_task, num_sets, rounded, limited):
     def taskset_gen_with_tda(utilization, hard_task_factor, fault_rate, num_task):
         while True:
-            if rounded is True:
+            if limited is True:
+                tasks = task_generator.taskGeneration_limited(num_task, utilization)
+            elif rounded is True:
                 tasks = task_generator.taskGeneration_rounded(num_task, utilization)
             else:
                 tasks = task_generator.taskGeneration_p(num_task, utilization)
@@ -35,7 +37,7 @@ def tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_task, n
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:m:f:h:r", ["ident=", "num_tasks=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded"])
+        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:m:f:h:rl", ["ident=", "num_tasks=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded", "limited"])
     except getopt.GetoptError as err:
         print (str(err))
         sys.exit(2)
@@ -43,6 +45,7 @@ def main():
     num_tasks, num_sets, max_fault_rate, step_size_fault_rate, hard_task_factor = 0, 0, 0, 0, 0
     ident = None
     rounded = False
+    limited = False
     for opt, arg in opts:
         if opt in ('-i', '--ident'):
             ident = str(arg)
@@ -58,12 +61,15 @@ def main():
             hard_task_factor = float(arg)
         if opt in ('-r', '--rounded'):
             rounded = True
+        if opt in ('-l', '--limited'):
+            limited = True
 
     for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
         print('Generating: %d tasksets, %d tasks, fault probability: %f, rounded: %r' % (num_sets, num_tasks, fault_rate, rounded))
         #for utilization in np.arange(5, 95, 5):
         for utilization in np.arange(30, 75, 20):
-            tasksets = tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_tasks, num_sets, rounded)
+        #for utilization in np.arange(90, 95, 20):
+            tasksets = tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_tasks, num_sets, rounded, limited)
             try:
                 if ident is not None:
                     filename = '../tasksets/tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')

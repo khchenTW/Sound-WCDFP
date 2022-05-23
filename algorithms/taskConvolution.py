@@ -14,6 +14,7 @@ from tkinter import W
 import numpy as np
 from operator import itemgetter, attrgetter
 from pkg_resources import get_distribution
+import mpmath as mp
 
 sys.path.append('../')
 from algorithms import TDA
@@ -39,9 +40,9 @@ def calculate_safe(tasks, prob_abnormal, probabilties, states, bound, sortedList
        if i >= min_time:
            times.append(i)
     times.sort()
-    # print('Time Points:')
-    # print(times)
-    print('Fail in Worst?:'+str(TDA.TDAtestWorst(tasks)))
+    #print('Time Points:')
+    #print(times)
+    #print('Fail in Worst?:'+str(TDA.TDAtestWorst(tasks)))
     for time in times:
         prob = calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, False)
         #print(prob)
@@ -293,8 +294,7 @@ def calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, sorted
     distri = empty_distri()
     # successively convolutes the starting distribution with the
     for i in range(0,len(distributions),1):
-        distri = convolute(distri, distributions[i])
-    distri = collapse(distri)
+        distri = convolute(distri, distributions[i])    
     prob =  calculate_miss_prob(distri, time)
     #print(prob)
     # states.append(len(distri))
@@ -413,7 +413,9 @@ def calculate_probabiltiy_prune_reduct(tasks, time, prob_abnormal, states, prune
 def get_distribution_inflation(task, time, exttime, prob_abnormal):
     distribution = []    
     a = math.ceil(time/task['deadline'])
+    #print (a)
     b = math.ceil((time+exttime)/task['deadline'])
+    #print (b)
     for k in range(0, int(a) + 1, 1):
         pair={}
         pair['misses']=k        
@@ -424,6 +426,7 @@ def get_distribution_inflation(task, time, exttime, prob_abnormal):
             pair['prob'] = (math.factorial(b)/(math.factorial(k)*math.factorial(b-k)))*math.pow(prob_abnormal, k)*math.pow((1-prob_abnormal),(b-k))
         pair['execution']=k*task['abnormal_exe']+(a-k)*task['execution']
         distribution.append(pair)
+    #print (distribution)
     return distribution
 
 # calculates the binomial distribution with carryin
@@ -551,7 +554,9 @@ def collapse(distri):
 # i.e., tests if the workload is larger than the execution time and sums up the
 # related probabilities.
 def calculate_miss_prob(distribution, time):
-    prob = np.longdouble(0.0)
+    #print(distribution)
+    #prob = np.longdouble(0.0)
+    prob = mp.mpf(0.0)
     for dist in distribution:
         if (dist['execution']>time):
             prob = prob + dist['prob']
@@ -600,7 +605,8 @@ def empty_distri():
     distri = []
     pair={}
     pair['misses']=''
-    pair['prob']=np.longdouble(1.0)
+    #pair['prob']=np.longdouble(1.0)
+    pair['prob']=mp.mpf(1.0)
     pair['execution']=0.0
     distri.append(pair)
     return distri
