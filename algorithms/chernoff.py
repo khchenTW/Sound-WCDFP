@@ -106,17 +106,20 @@ def logmgf_tasks_inflation(task, other, interval):
     def logmgf_task(task, interval):
         # Calculate the number of jobs released in the interval
         num_jobs_released = int(math.ceil(float(interval)/task['period']))
+        saiTasks = []
+        flag = False
+        allTasks = np.concatenate(([task], other))
+        for i in range(0, len(allTasks)-1, 1):
+            if allTasks[i] == task:
+                flag = True
+            if flag == True:
+                saiTasks.append(allTasks[i]) 
+        exttime = sum(tsk['deadline'] for tsk in saiTasks)  
 
-        # Get the index of task -- if it is in the list of higher priority tasks
-        result = np.where(other == task)
-        if len(result) > 0 and len(result[0]) > 0:
-            ind = result[0][0]
-            extInterval = interval + sum(tsk['deadline'] for tsk in other[ind:])
-        else:
-            extInterval = interval
+        sainum_jobs= int(math.ceil(float((interval+exttime))/task['period']))
         # Calculate the extended interval
         # make an inflated task
-        task = sample_inflate_bernoulli_2(task, num_jobs_released, int(math.ceil(float(extInterval)/task['period'])))
+        task = sample_inflate_bernoulli_2(task, num_jobs_released, sainum_jobs)
         #print('numberReleased: '+str(num_jobs_released))
         #print('window: '+str(int(math.ceil(float(extInterval)/task['period']))))
         #print(task['infpdf'])

@@ -125,7 +125,7 @@ def main():
         # single thread version
         print ('Single Thread')
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
-            for utilization in np.arange(50, 55, 20):
+            for utilization in np.arange(50, 95, 10):
             #for utilization in np.arange(90, 95, 20):
                 print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, U: %d' % (num_sets, num_tasks, fault_rate, rounded, utilization))
                 try:

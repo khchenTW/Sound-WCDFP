@@ -57,7 +57,7 @@ def plot_datasets(dataset, view, utilization):
     ax.tick_params(axis='both', which='major',labelsize=12)
     
     #labels = ['Original', 'Carry-In', 'Inflation']
-    labels = ['Conv-CarryIn','Conv-Inflation', 'CarryIn', 'Inflation']
+    labels = ['Conv-CarryIn','Conv-Inflation', 'CB-CarryIn', 'CB-Inflation']
     #the blue box
     boxprops = dict(linewidth=2, color='blue')
     #the median line
@@ -124,7 +124,7 @@ def main():
     dataset = []
 
     #for num_tasks, num_sets in zip([2, 3, 5], [20, 20, 20]):
-    for num_tasks, num_sets in zip([2, 3, 5], [20, 20, 20]):
+    for num_tasks, num_sets in zip([2, 3, 5], [10, 10, 10, 10]):
         if ident is not None:
             #filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
             filename_carry = 'res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
@@ -151,10 +151,10 @@ def main():
                     counterCarry = 0
                     same = 0
                     for res_carry, res_inflation, res_conv_carry, res_conv_inflation in zip(results_carry, results_inflation, results_conv_carry, results_conv_inflation):
-                        if res_carry['ErrProb'] > res_inflation['ErrProb']:
+                        if res_conv_carry > res_conv_inflation:
                             counterInflation +=1
-                            print('Res: carry'+str(res_carry['ErrProb'])+' inflation'+str(res_inflation['ErrProb']))
-                        elif res_inflation['ErrProb'] > res_carry['ErrProb']:
+                            print('Res: carry'+str(res_conv_carry)+' inflation'+str(res_conv_inflation))
+                        elif res_conv_inflation > res_conv_carry:
                             counterCarry +=1
                         else:
                             same +=1                    
