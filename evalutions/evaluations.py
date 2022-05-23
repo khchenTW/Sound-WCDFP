@@ -42,17 +42,23 @@ def func_star(a_b):
 '''
 def insideroutine(taskset, max_fault_rate):
     #print(taskset[0])
+    results_conv_carry = []
+    results_conv_inflation = []
     results_carry = []
     results_inflation = []
-    
-    print('Computing the chernoff bounds with Carry-in')
+
+    #print('Computing the convolution with Carry-in')
+    results_conv_carry.append(taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Carryin', True))
+    #print('Computing the convolution with Inflation')
+    results_conv_inflation.append(taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Inflation', True))
+                            
+    #print('Computing the chernoff bounds with Carry-in')
     results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
-    
-    print('Computing the chernoff bounds with Inflation')
+    #print('Computing the chernoff bounds with Inflation')
     results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
     
-    print('DONE!')
-    return [results_carry, results_inflation]
+    #print('DONE!')
+    return [results_conv_carry, results_conv_inflation, results_carry, results_inflation]
 
 def main():
     try:
@@ -86,12 +92,10 @@ def main():
     if parallel == True:
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
             print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, parallel: %r' % (num_sets, num_tasks, fault_rate, rounded, parallel))
-            #for utilization in np.arange(5, 100, 5):
-            #for utilization in np.arange(50, 55, 20):
-            for utilization in np.arange(30, 75, 20):
+            for utilization in np.arange(40, 85, 20):
                 try:
                     if ident is not None:
-                        filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + str('r' if rounded else '')
+                        filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
 
                         # Load the generated tasksets
                         try:
@@ -100,6 +104,8 @@ def main():
                             raise Exception("Could not read")
 
                         # Init lists for storing Calculated DMP
+                        results_conv_carry = []
+                        results_conv_inflation = []
                         results_carry = []
                         results_inflation = []
                         rel = []
@@ -107,12 +113,17 @@ def main():
                         # Distribute to multiprocesses
                         if __name__=='__main__':
                             freeze_support()
-                            p = Pool(5)
+                            p = Pool(4)
                             rel = (p.map(func_star, zip(tasksets,itertools.repeat(max_fault_rate))))
                         #print(rel)
                         for i in rel:
-                            results_carry.append(i[0])
-                            results_inflation.append(i[1])
+                            results_conv_carry.append(i[0][0])
+                            results_conv_inflation.append(i[1][0])
+                            results_carry.append(i[2][0])
+                            results_inflation.append(i[3][0])
+                            
+                        np.save('../results/mp_res_conv_carry_' + filename + '.npy', results_conv_carry)
+                        np.save('../results/mp_res_conv_inflation_' + filename + '.npy', results_conv_inflation)
                         np.save('../results/mp_res_carry_' + filename + '.npy', results_carry)
                         np.save('../results/mp_res_inflation_' + filename + '.npy', results_inflation)
                     else:
@@ -125,7 +136,8 @@ def main():
         # single thread version
         print ('Single Thread')
         for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
-            for utilization in np.arange(50, 95, 10):
+            #for utilization in np.arange(50, 95, 10):
+            for utilization in np.arange(40, 85, 20):
             #for utilization in np.arange(90, 95, 20):
                 print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, rounded: %r, U: %d' % (num_sets, num_tasks, fault_rate, rounded, utilization))
                 try:

@@ -15,6 +15,18 @@ import mixed_task_builder
 ofile = "taskset-p.txt"
 USet=[]
 
+def loguniform(n, limited, Tmin=1, Tmax=100, base=10):
+    TSet = []
+    if limited == False:
+        for i in range(n):
+            TSet.append(math.pow(base, random.uniform(math.log(Tmin, base), math.log(Tmax, base))))
+        #print(TSet)
+    else:
+        for i in range(n):
+            TSet.append(math.pow(base, random.uniform(math.log(Tmin, base), math.log(10, base))))
+        #print(TSet)
+    return TSet
+
 def UUniFast(n,U_avg):
     global USet
     sumU=U_avg
@@ -81,12 +93,14 @@ def CSet_generate_int(Pmin,numLog):
         pair['execution']=round(i*p,0)
         PSet.append(pair)
         j=j+1;
-
+'''
 def CSet_generate_rounded(Pmin,numLog):
     global USet,PSet
     j=0
     for i in USet:
         thN=j%numLog
+        print(Pmin*math.pow(10, thN))
+        print(Pmin*math.pow(10, thN+1))
         p=random.uniform(Pmin*math.pow(10, thN), Pmin*math.pow(10, thN+1))
         pair={}
         pair['period']=round(p,2)
@@ -94,13 +108,24 @@ def CSet_generate_rounded(Pmin,numLog):
         pair['execution']=round(i*p,2)
         PSet.append(pair)
         j=j+1;
-
-def CSet_generate_limited(Pmin,numLog):
+'''
+def CSet_generate_rounded(n, limited):
     global USet,PSet
     j=0
-    for i in USet:
-        thN=j%numLog
-        p=random.uniform(Pmin*math.pow(1, thN), Pmin*math.pow(1, thN+1))
+    P = loguniform(n, limited)
+    for i, p in zip(USet, P):
+        pair={}
+        pair['period']=round(p,2)
+        pair['deadline']=round(p,2)#*random.uniform(1)
+        pair['execution']=round(i*p,2)
+        PSet.append(pair)
+        j=j+1;
+
+def CSet_generate_limited(n, limited):
+    global USet,PSet
+    j=0
+    P = loguniform(n, limited)
+    for i, p in zip(USet, P):
         pair={}
         pair['period']=round(p,2)
         pair['deadline']=round(p,2)#*random.uniform(1)
@@ -133,13 +158,15 @@ def taskGeneration_rounded(numTasks,uTotal):
     random.seed()
     init()
     UUniFast(numTasks,uTotal/100)
-    CSet_generate_rounded(10,2)
+    #CSet_generate_rounded(10,2)
+    CSet_generate_rounded(numTasks, False)
     return PSet
 
 def taskGeneration_limited(numTasks,uTotal):
     random.seed()
     init()
     UUniFast(numTasks,uTotal/100)
-    CSet_generate_limited(10,2)
+    #CSet_generate_limited(10,2)
+    CSet_generate_limited(numTasks, True)
     return PSet
 

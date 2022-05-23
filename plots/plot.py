@@ -80,14 +80,14 @@ def plot_datasets(dataset, view, utilization):
     av = mpatches.Patch(color='orange', label='Median', linewidth=3)
     whisk = mpatches.Patch(color='black', label='Whiskers', linewidth=3)
     ax.grid()
-    plt.legend(handles=[av, box, whisk], fontsize=12, frameon=True, loc=5)
+    plt.legend(handles=[av, box, whisk], fontsize=12, frameon=True, loc=4)
     #plt.clf()
     #plt.show()
     return fig
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:u:s:m:f:h:rv:", ["ident=", "utilization=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded", "view="])
+        opts, args = getopt.getopt(sys.argv[1:], "i:u:s:m:f:h:rv:p", ["ident=", "utilization=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded", "view=", "parallel"])
     except getopt.GetoptError as err:
         print (str(err))
         sys.exit(2)
@@ -96,6 +96,7 @@ def main():
     num_sets, max_fault_rate, step_size_fault_rate, hard_task_factor = 0, 0, 0, 0
     ident, view, title = None, None, None
     rounded = False
+    parallel = False
 
     utilization = 50
     #utilization = 70
@@ -118,25 +119,39 @@ def main():
             rounded = True
         if opt in ('-v', '--view'):
             view = str(arg)
+        if opt in ('-p', '--parallel'):
+            parallel = True
 
     datasets = []
     # for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
     dataset = []
 
-    #for num_tasks, num_sets in zip([2, 3, 5], [20, 20, 20]):
-    for num_tasks, num_sets in zip([2, 3, 5], [10, 10, 10, 10]):
+    for num_tasks, num_sets in zip([2,3,5], [10,10,10]):
+    #for num_tasks, num_sets in zip([2, 3, 5, 10], [10, 10, 10, 10]):
         if ident is not None:
             #filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
-            filename_carry = 'res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
-            filename_inflation = 'res_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
-            filename_conv_carry = 'res_conv_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
-            filename_conv_inflation = 'res_conv_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+            if parallel == True:
+                filename_carry = 'mp_res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
+                filename_inflation = 'mp_res_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+                filename_conv_carry = 'mp_res_conv_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+                filename_conv_inflation = 'mp_res_conv_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+            else:
+                filename_carry = 'res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
+                filename_inflation = 'res_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+                filename_conv_carry = 'res_conv_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+                filename_conv_inflation = 'res_conv_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+
             try:
                 #results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
-                results_conv_inflation = np.load('../results/' + filename_conv_inflation + '.npy', allow_pickle=True)
                 results_conv_carry = np.load('../results/' + filename_conv_carry + '.npy', allow_pickle=True)
+                results_conv_inflation = np.load('../results/' + filename_conv_inflation + '.npy', allow_pickle=True)
                 results_carry = np.load('../results/' + filename_carry + '.npy', allow_pickle=True)
                 results_inflation = np.load('../results/' + filename_inflation + '.npy', allow_pickle=True)
+                #print (results_conv_carry)
+                #print (results_conv_inflation)
+                #print (results_carry)
+                #print (results_inflation)
+
                 if view == 'prob_log':
                     for res_carry, res_inflation, res_conv_carry, res_conv_inflation in zip(results_carry, results_inflation, results_conv_carry, results_conv_inflation):
                         dataset.append([res_conv_carry, res_conv_inflation, res_carry['ErrProb'], res_inflation['ErrProb']])
