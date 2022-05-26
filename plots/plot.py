@@ -21,7 +21,8 @@ rcParams['font.sans-serif'] = ['Tahoma']
 rcParams['ps.useafm'] = True
 rcParams['pdf.use14corefonts'] = True
 rcParams['text.usetex'] = True
-rcParams["figure.figsize"] = (12,10)
+#rcParams["figure.figsize"] = (8,9) # for 4 sets
+rcParams["figure.figsize"] = (5,9) # for 2 sets
 
 def plot_datasets(dataset, view, utilization):
     figlabel = itertools.cycle(('a','b','c','d','e','f','g','h','i'))
@@ -33,7 +34,6 @@ def plot_datasets(dataset, view, utilization):
     fig.subplots_adjust (top = 0.5, bottom = 0.2, left = 0.1, right = 0.95, hspace = 0.3, wspace=0.05)
 
     bxinput = []
-    ori = []
     conv_carry = []
     conv_inflation = []
     carry = []
@@ -45,9 +45,12 @@ def plot_datasets(dataset, view, utilization):
         carry.append(inputs[2])
         inflation.append(inputs[3])
         #print(inputs)
-    #bxinput.append(ori)
-    bxinput.append(conv_carry)
-    bxinput.append(conv_inflation)
+    #print(len(conv_carry))
+    #print(len(conv_inflation))
+    #print(len(carry))
+    #print(len(inflation))
+    #bxinput.append(conv_carry)
+    #bxinput.append(conv_inflation)
     bxinput.append(carry)
     bxinput.append(inflation)
     #print (bxinput)
@@ -55,9 +58,17 @@ def plot_datasets(dataset, view, utilization):
     ax.set_yscale("log")
     ax.set_ylabel('WCDFP (log-scale)',size=20)
     ax.tick_params(axis='both', which='major',labelsize=12)
+    ax.set_ylim([10**-30, 10**5])
+    #ax.set_ylim([10**-300, 10**5]) # for CB sets
+    ax.set_yticks([10**-30, 10**-20, 10**-10, 10**0]) # for CB sets U45
+    #ax.set_yticks([10**-300, 10**-200, 10**-100, 10**0]) # for CB sets
+    #ax.set_yticks([10**-60, 10**-45, 10**-30, 10**-15, 10**0]) # for 4 methods
+    #ax.set_ylim(top=10**0)
     
-    #labels = ['Original', 'Carry-In', 'Inflation']
-    labels = ['Conv-CarryIn','Conv-Inflation', 'CB-CarryIn', 'CB-Inflation']
+    #labels = ['Conv-CarryIn','Conv-Inflation', 'CB-CarryIn', 'CB-Inflation'] # 4 sets
+    #ax.vlines(0.5, 0, 1, linestyles='dotted', transform=ax.transAxes)
+    #labels = ['Conv-CarryIn','Conv-Inflation'] # 2 sets
+    labels = ['CB-CarryIn','CB-Inflation'] # 2 sets
     #the blue box
     boxprops = dict(linewidth=2, color='blue')
     #the median line
@@ -66,21 +77,19 @@ def plot_datasets(dataset, view, utilization):
     capprops = dict(linewidth=2.5)
 
     for tick in ax.xaxis.get_major_ticks():
-        tick.label.set_fontsize(25)
+        tick.label.set_fontsize(20)
 
     for tick in ax.yaxis.get_major_ticks():
-        tick.label.set_fontsize(25)
+        tick.label.set_fontsize(18)
 
-    try:
-        ax.boxplot(bxinput, 0, '', labels=labels, boxprops=boxprops, whiskerprops=whiskerprops, capprops=capprops, medianprops=medianprops)
-    except ValueError:
-        print ("ValueError")
+    ax.boxplot(bxinput, 0, '', labels=labels, boxprops=boxprops, whiskerprops=whiskerprops, capprops=capprops, medianprops=medianprops, widths=(0.6, 0.6))
+    #ax.boxplot(bxinput, 0, '', labels=labels, boxprops=boxprops, whiskerprops=whiskerprops, capprops=capprops, medianprops=medianprops, widths=(0.6, 0.6, 0.6, 0.6))
 
-    box = mpatches.Patch(color='blue', label='1st to 3rd Quartiles', linewidth=3)
-    av = mpatches.Patch(color='orange', label='Median', linewidth=3)
-    whisk = mpatches.Patch(color='black', label='Whiskers', linewidth=3)
+    #box = mpatches.Patch(color='blue', label='1st to 3rd Quartiles', linewidth=3)
+    #av = mpatches.Patch(color='orange', label='Median', linewidth=3)
+    #whisk = mpatches.Patch(color='black', label='Whiskers', linewidth=3)
     ax.grid()
-    plt.legend(handles=[av, box, whisk], fontsize=12, frameon=True, loc=4)
+    #plt.legend(handles=[av, box, whisk], fontsize=12, frameon=True, loc=3)
     #plt.clf()
     #plt.show()
     return fig
@@ -126,8 +135,8 @@ def main():
     # for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
     dataset = []
 
-    for num_tasks, num_sets in zip([2,3,5], [10,10,10]):
-    #for num_tasks, num_sets in zip([2, 3, 5, 10], [10, 10, 10, 10]):
+    #for num_tasks, num_sets in zip([15, 20], [20, 20] ):
+    for num_tasks, num_sets in zip([5, 2], [100, 100]):
         if ident is not None:
             #filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
             if parallel == True:
@@ -143,10 +152,19 @@ def main():
 
             try:
                 #results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
+                #server (110):
+                #results_conv_carry = np.load('../results_epyc0/' + filename_conv_carry + '.npy', allow_pickle=True)
+                #results_conv_inflation = np.load('../results_epyc0/' + filename_conv_inflation + '.npy', allow_pickle=True)
+                #results_carry = np.load('../results_epyc0/' + filename_carry + '.npy', allow_pickle=True)
+                #results_inflation = np.load('../results_epyc0/' + filename_inflation + '.npy', allow_pickle=True)
+
+                #server (1100-CB):
+                #laptop (1100):
                 results_conv_carry = np.load('../results/' + filename_conv_carry + '.npy', allow_pickle=True)
                 results_conv_inflation = np.load('../results/' + filename_conv_inflation + '.npy', allow_pickle=True)
                 results_carry = np.load('../results/' + filename_carry + '.npy', allow_pickle=True)
                 results_inflation = np.load('../results/' + filename_inflation + '.npy', allow_pickle=True)
+
                 #print (results_conv_carry)
                 #print (results_conv_inflation)
                 #print (results_carry)
