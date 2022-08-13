@@ -40,19 +40,13 @@ def calculate_safe(tasks, prob_abnormal, probabilties, states, bound, sortedList
        if i >= min_time:
            times.append(i)
     times.sort()
-    #print('Time Points:')
-    #print(times)
-    #print('Fail in Worst?:'+str(TDA.TDAtestWorst(tasks)))
     for time in times:
-        prob = calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, False)
-        #print(prob)
+        prob = calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, False)        
         probabilties.append(prob)
     probability = 1
     for i in range(0, len(times),1):
         if (probabilties[i]<probability):
             probability = probabilties[i]
-    # print('Bound'+str(bound))
-    # print(probability)
     return probability
 
 ''' Calculates the probability of deadline miss as detailed in Section 5.
@@ -63,11 +57,13 @@ All job releases of higher priority tasks are considered.
 'probabilities' tracks the calculated probabilities for each time point
 'states' tracks the number of states considered for each time point '''
 
-def calculate(tasks, prob_abnormal, probabilties, states):
-    tasks = sort(tasks, 'deadline', False)
+def calculate(tasks, prob_abnormal, probabilties, states, sortedList=False):
+    if sortedList == True:
+        tasks = sort(tasks, 'deadline', False)
     deadline = tasks[len(tasks)-1]['deadline']
     min_time = TDA.min_time(tasks, 'execution')
-    tasks = sort(tasks, 'execution', True)
+    if sortedList == True:
+        tasks = sort(tasks, 'execution', True)
     all_times = all_releases(tasks, deadline)
     times = []
     for i in all_times:
@@ -285,19 +281,15 @@ def calculate_probabiltiy_safe(tasks, time, prob_abnormal, states, bound, sorted
                         flag = True
                     if flag == True:
                         saiTasks.append(tasks[i]) 
-                exttime = sum(tsk['deadline'] for tsk in saiTasks)            
-                #print (exttime)            
+                exttime = sum(tsk['deadline'] for tsk in saiTasks)                            
                 distributions.append(get_distribution_inflation(task, time, exttime, prob_abnormal))
-    #print("Exact Distributions: ")
-    #print(distributions)
     # creates an empty distribution as starting point for the convolution
     distri = empty_distri()
     # successively convolutes the starting distribution with the
     for i in range(0,len(distributions),1):
         distri = convolute(distri, distributions[i])    
-    prob =  calculate_miss_prob(distri, time)
-    #print(prob)
-    # states.append(len(distri))
+    prob =  calculate_miss_prob(distri, time)    
+    #states.append(len(distri))
     return prob
 
 ''' Calculates the deadline miss probability for a given point in time'''
@@ -313,7 +305,7 @@ def calculate_probabiltiy(tasks, time, prob_abnormal, states):
     for i in range(0,len(distributions),1):
         distri = convolute(distri, distributions[i])
     prob =  calculate_miss_prob(distri, time)
-    states.append(len(distri))
+    #states.append(len(distri))
     return prob
 
 # probability calculation for one time point with pruning
