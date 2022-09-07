@@ -48,8 +48,17 @@
 #python evaluations.py -i rtss -n 3 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p
 #python evaluations.py -i rtss -n 5 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p
 #python evaluations.py -i rtss -n 20 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p
-python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
-python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
+#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
+#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
 #python evaluations.py -i rtss -n 15 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
 #python evaluations.py -i rtss -n 20 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
+
+# shepherding
+
+#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
+#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p # 6 methods
+python evaluations.py -i rtss -n 5 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p # only CB
+#python evaluations.py -i rtss -n 15 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p # only CB
+#python evaluations.py -i rtss -n 25 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p # only CB
+
 sleep 1
