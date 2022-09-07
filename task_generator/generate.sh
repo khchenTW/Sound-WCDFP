@@ -25,7 +25,8 @@
 # shepherding
 
 #python generate.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.83 -r # [1,100]
-python generate.py -i rtss -n 15 -s 20 -m 0.025 -f 0.025 -h 1.83 -r # [1,100]
-python generate.py -i rtss -n 25 -s 20 -m 0.025 -f 0.025 -h 1.83 -r # [1,100]
+python generate.py -i rtss -n 5 -s 100 -m 0.025 -f 0.025 -h 1.83 -r # [1,100] for U80
+#python generate.py -i rtss -n 15 -s 20 -m 0.025 -f 0.025 -h 1.83 -r # [1,100]
+#python generate.py -i rtss -n 25 -s 20 -m 0.025 -f 0.025 -h 1.83 -r # [1,100]
 
 sleep 1
