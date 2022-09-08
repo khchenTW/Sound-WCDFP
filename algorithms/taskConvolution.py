@@ -1,9 +1,3 @@
-''' Implementation of the novel multinomial-based approach as detailed in Section 5.
-For the actual implementation the binomial case is considered.
-Furthermore, since the multinomial-based approach relies on convolution to merge
-multinomial representations of tasks the convolution based approach is implemented
-in this file as well. '''
-
 from __future__ import division
 from importlib.metadata import distribution
 from pickle import FALSE
@@ -19,7 +13,7 @@ import mpmath as mp
 sys.path.append('../')
 from algorithms import TDA
 
-''' Calculates the probability of deadline miss with safe upper bounds (Carry-in or inflation)
+''' Calculates the probability of deadline miss with safe upper bounds (Carry-in or inflation), varience of ECRTS'18 implementation
 
 'tasks represents' the given task set,
 'prob_abnormal' the probability of abnormal execution, i.e., higher WCET.
@@ -49,7 +43,7 @@ def calculate_safe(tasks, prob_abnormal, probabilties, states, bound, sortedList
             probability = probabilties[i]
     return probability
 
-''' Calculates the probability of deadline miss as detailed in Section 5.
+''' Calculates the probability of deadline miss as detailed in Section 5 (ECRTS'18).
 All job releases of higher priority tasks are considered.
 
 'tasks represents' the given task set,
@@ -75,178 +69,6 @@ def calculate(tasks, prob_abnormal, probabilties, states, sortedList=False):
         probabilties.append(prob)
     probability = 1
     for i in range(0, len(times),1):
-        if (probabilties[i]<probability):
-            probability = probabilties[i]
-    return probability
-
-''' Calculates the probability of deadline miss as detailed in Section 5.
-All job releases of higher priority tasks are considered.
-The state pruning introduced in Section 6.1 is used
-
-'tasks represents' the given task set,
-'prob_abnormal' the probability of abnormal execution, i.e., higher WCET.
-'probabilities' tracks the calculated probabilities for each time point
-'states' tracks the number of states for each time point
-'pruned' tracks the number of states for each time point after pruning '''
-
-def calculate_prune(tasks, prob_abnormal, probabilties, states, pruned):
-    tasks = sort(tasks, 'deadline', False)
-    deadline = tasks[len(tasks)-1]['deadline']
-    min_time = TDA.min_time(tasks, 'execution')
-    tasks = sort(tasks, 'execution', True)
-    all_times = all_releases(tasks, deadline)
-    times = []
-    for i in all_times:
-        if i > min_time:
-            times.append(i)
-    times.sort()
-    for time in times:
-        prob = calculate_probabiltiy_prune(tasks, time, prob_abnormal, states, pruned)
-        probabilties.append(prob)
-    probability = 1
-    for i in range(0, len(times),1):
-        if (probabilties[i]<probability):
-            probability = probabilties[i]
-    return probability
-
-''' Calculates the probability of deadline miss as detailed in Section 5.
-All job releases of higher priority tasks are considered.
-The state pruning introduced in Section 6.1 is used
-Furthermore, the reduction of the binomial representation in Section 6.2
-
-'max_error_allowed' describes the maximum total error that is allowed after state
-reduction for all binomial representations.
-'tasks represents' the given task set,
-'prob_abnormal' the probability of abnormal execution, i.e., higher WCET.
-'probabilities' tracks the calculated probabilities for each time point
-'states' tracks the number of states for each time point
-'pruned' tracks the number of states for each time point after pruning
-'max_error' tracks the maximum possible error that can occur after the reduction '''
-
-def calculate_prune_reduct(tasks, prob_abnormal, probabilties, states, pruned, max_error, max_error_allowed):
-    tasks = sort(tasks, 'deadline', False)
-    deadline = tasks[len(tasks)-1]['deadline']
-    min_time = TDA.min_time(tasks, 'execution')
-    tasks = sort(tasks, 'execution', True)
-    all_times = all_releases(tasks, deadline)
-    times = []
-    for i in all_times:
-        if i > min_time:
-            times.append(i)
-    times.sort()
-    error = []
-    for time in times:
-        prob = calculate_probabiltiy_prune_reduct(tasks, time, prob_abnormal, states, pruned, error, max_error_allowed)
-        probabilties.append(prob)
-    max_error.append(np.max(error))
-    probability = 1
-    for i in range(0, len(times),1):
-        if (probabilties[i]<probability):
-            probability = probabilties[i]
-    return probability
-
-''' Approximates the probability of deadline miss as detailed in Section 5
-by only considering the last release of all higher priority tasks.
-The state pruning introduced in Section 6.1 is used
-
-'tasks represents' the given task set,
-'prob_abnormal' the probability of abnormal execution, i.e., higher WCET.
-'probabilities' tracks the calculated probabilities for each time point
-'states' tracks the number of states for each time point
-'pruned' tracks the number of states for each time point after pruning '''
-
-def approximate_prune(tasks, prob_abnormal, probabilties, states, pruned):
-    tasks = sort(tasks, 'deadline', False)
-    deadline = tasks[len(tasks)-1]['deadline']
-    tasks = sort(tasks, 'execution', True)
-    times = last_release(tasks, deadline)
-    times.sort()
-    for time in times:
-        prob = calculate_probabiltiy_prune(tasks, time, prob_abnormal, states, pruned)
-        probabilties.append(prob)
-    probability = 1
-    for i in range(0, len(times),1):
-        if (probabilties[i]<probability):
-            probability = probabilties[i]
-    return probability
-
-''' The convolution based approach by Maxim and Cucu-Grosjean [17]'''
-def convolution(tasks, prob_abnormal, probabilties, states):
-    tasks = sort(tasks, 'deadline', False)
-    deadline = tasks[len(tasks)-1]['deadline']
-    releases = []
-    times = []
-    calculate_releases(tasks, deadline, releases, prob_abnormal)
-    releases = sorted(releases, key=lambda release:release[0]['time'])
-    min_time = TDA.min_time(tasks, 'execution')
-    tasks = sort(tasks, 'execution', True)
-    all_times = all_releases(tasks, deadline)
-    distri = empty_distri()
-    t = 0.0
-    #print 'releases: ' + repr(len(releases))
-    #print 'states: ' + repr(math.pow(2,len(releases)))
-    while (t < deadline):
-        i = 0
-        #print len(distri)
-        job = releases[0]
-        while(job[0]['time']== t):
-            distri = convolute(distri, job)
-            del releases[0]
-            if len(releases) > 0:
-                job = releases[0]
-            else:
-                break
-            i = i + 1
-        if len(releases) > 0:
-            t = job[0]['time']
-        else:
-            t = deadline
-        prob = calculate_miss_prob(distri, t)
-        probabilties.append(prob)
-        times.append(t)
-    states.append(len(distri))
-    probability = 1
-    for i in range(0, len(probabilties),1):
-        if (probabilties[i]<probability):
-            probability = probabilties[i]
-    return probability
-
-''' The convolution based approach by Maxim and Cucu-Grosjean [17] with state merging'''
-def convolution_merge(tasks, prob_abnormal, probabilties, states, pruned):
-    tasks = sort(tasks, 'deadline', False)
-    deadline = tasks[len(tasks)-1]['deadline']
-    releases = []
-    times = []
-    calculate_releases(tasks, deadline, releases, prob_abnormal)
-    releases = sorted(releases, key=lambda release:release[0]['time'])
-    states.append(int(math.pow(2,len(releases))))
-    min_time = TDA.min_time(tasks, 'execution')
-    tasks = sort(tasks, 'execution', True)
-    all_times = all_releases(tasks, deadline)
-    distri = empty_distri()
-    t = 0.0
-    while (t < deadline):
-        i = 0
-        job = releases[0]
-        while(job[0]['time']== t):
-            distri = convolute(distri, job)
-            distri = collapse(distri)
-            del releases[0]
-            if len(releases) > 0:
-                job = releases[0]
-            else:
-                break
-            i = i + 1
-        if len(releases) > 0:
-            t = job[0]['time']
-        else:
-            t = deadline
-        prob = calculate_miss_prob(distri, t)
-        probabilties.append(prob)
-        pruned.append(len(distri))
-        times.append(t)
-    probability = 1
-    for i in range(0, len(probabilties),1):
         if (probabilties[i]<probability):
             probability = probabilties[i]
     return probability
@@ -308,106 +130,11 @@ def calculate_probabiltiy(tasks, time, prob_abnormal, states):
     #states.append(len(distri))
     return prob
 
-# probability calculation for one time point with pruning
-def calculate_probabiltiy_prune(tasks, time, prob_abnormal, states, pruned_states):
-    order = sort(tasks, 'execution', True)
-    distributions = []
-    for task in order:
-        distributions.append(get_distribution(task, time, prob_abnormal))
-    min = []
-    max = []
-    num_states = []
-    pruned = []
-    prob_cut = []
-    prob = 0.0
-    minimum = 0.0
-    maximum = 0.0
-    for distri in distributions:
-        min.append(distri[0]['execution'])
-        minimum = minimum + distri[0]['execution']
-        max.append(distri[len(distri)-1]['execution'])
-        maximum = maximum + distri[len(distri)-1]['execution']
-    max_states = 1
-    if (minimum > time):
-        return 1.0
-    elif (maximum < time):
-        return 0.0
-    else:
-        distri = empty_distri()
-        for i in range(0,len(distributions),1):
-            max_states = max_states * len(distributions[i])
-            minimum = minimum - min[i]
-            maximum = maximum - max[i]
-            distri = convolute_prune(distri, distributions[i], minimum, maximum, num_states, pruned, prob_cut, time)
-            if (len(distri)>100):
-                distri = collapse(distri)
-        for i in prob_cut:
-            prob = prob + i
-        prob = prob + calculate_miss_prob(distri, time)
-        max_num_states = np.amax(num_states)
-        pruned_states.append(max_num_states)
-        states.append(max_states)
-        return prob
-
-
-# probability calculation for one time point with pruning and reduction
-def calculate_probabiltiy_prune_reduct(tasks, time, prob_abnormal, states, pruned_states, total_error, max_error_allowed):
-    order = sort(tasks, 'execution', True)
-    individual_max_error = max_error_allowed / (len(tasks)-1)
-    distributions = []
-    max_error = []
-    i = 0
-    for task in order:
-        i = i + 1
-        error = []
-        distri = get_distribution_reduct(task, time, prob_abnormal, error, individual_max_error)
-        err = np.sum(error)
-        max_error.append(err)
-        distributions.append(distri)
-    tot_err = np.sum(max_error)
-    total_error.append(tot_err)
-    min = []
-    max = []
-    num_states = []
-    pruned = []
-    prob_cut = []
-    prob = 0.0
-    minimum = 0.0
-    maximum = 0.0
-    for distri in distributions:
-        min.append(distri[0]['execution'])
-        minimum = minimum + distri[0]['execution']
-        max.append(distri[len(distri)-1]['execution'])
-        maximum = maximum + distri[len(distri)-1]['execution']
-    max_states = 1
-    if (minimum > time):
-        return 1.0
-    elif (maximum < time):
-        return 0.0
-    else:
-        distri = empty_distri()
-        for i in range(0,len(distributions),1):
-            max_states = max_states * len(distributions[i])
-            minimum = minimum - min[i]
-            maximum = maximum - max[i]
-            distri = convolute_prune(distri, distributions[i], minimum, maximum, num_states, pruned, prob_cut, time)
-            if (len(distri)>100):
-                distri = collapse(distri)
-        for i in prob_cut:
-            prob = prob + i
-        prob = prob + calculate_miss_prob(distri, time)
-        max_num_states = np.amax(num_states)
-        pruned_states.append(max_num_states)
-        states.append(max_states)
-        return prob
-
 # calculates the binomial distribution with the inflated pdf
 def get_distribution_inflation(task, time, exttime, prob_abnormal):
     distribution = []    
     a = math.ceil(time/task['deadline'])
-    #print (a)
     b = math.ceil((time+exttime)/task['deadline'])
-    #print (b)
     for k in range(0, int(a) + 1, 1):
         pair={}
         pair['misses']=k        
@@ -445,47 +172,6 @@ def get_distribution(task, time, prob_abnormal):
         distribution.append(pair)
     return distribution
 
-# calculating the reducted distribution for a given task
-def get_distribution_reduct(task, time, prob_abnormal, max_error, task_error):
-    distribution = []
-    n = math.ceil(time/task['deadline'])
-    for k in range(0, int(n) + 1, 1):
-        pair={}
-        pair['misses']=k
-        pair['prob']= (math.factorial(n)/(math.factorial(k)*math.factorial(n-k)))*math.pow(prob_abnormal, k)*math.pow((1-prob_abnormal),(n-k))
-        pair['execution']=k*task['abnormal_exe']+(n-k)*task['execution']
-        distribution.append(pair)
-    # if the original distribution has 6 states or less (5 jobs or less) it is directly kept
-    if (len(distribution)<= 6):
-        return distribution
-    else:
-        # otherwise all states are kept (starting from the ones with highest probability)
-        # until the total probability of the remaining states is less than the 'task_error'
-        total_prob = 0.0
-        reducted_distribution = []
-        i = 0
-        while (i < 6):
-            reducted_distribution.append(distribution[0])
-            total_prob = total_prob + distribution[0]['prob']
-            del distribution[0]
-            i = i + 1
-        i = 0
-        while (len(distribution)> 0 and (total_prob <= 1 - task_error)):
-            reducted_distribution.append(distribution[0])
-            total_prob = total_prob + distribution[0]['prob']
-            del distribution[0]
-        if (len(distribution) > 0):
-            pair={}
-            pair['prob']= 0.0
-            while(len(distribution) > 0):
-                pair['prob']=pair['prob'] + distribution[0]['prob']
-                pair['execution']=distribution[0]['execution']
-                if (len(distribution)>1):
-                    max_error.append(distribution[0]['prob'])
-                del distribution[0]
-            reducted_distribution.append(pair)
-        return reducted_distribution
-
 # direct convolution of two distributions
 def convolute(dist1, dist2):
     dist = []
@@ -497,8 +183,8 @@ def convolute(dist1, dist2):
             dist.append(pair)
     return dist
 
-''' direct convolution of two distributions. The pruning techniques presented in
-Section 6.2 are used to prune away unnecessary states. '''
+# ''' direct convolution of two distributions. The pruning techniques presented in
+# Section 6.2 (ECRTS'18) are used to prune away unnecessary states. '''
 def convolute_prune(dist1, dist2, minimum, maximum, num_states, pruned, prob_cut, time):
     prob = 0.0
     dist = []
@@ -525,22 +211,6 @@ def convolute_prune(dist1, dist2, minimum, maximum, num_states, pruned, prob_cut
     pruned.append(prune)
     num_states.append(states)
     return dist
-
-# collapsing the state space by merging states with same workload
-def collapse(distri):
-    distri = sorted(distri, key=lambda r:r['execution'])
-    collapsed = []
-    current={}
-    current['prob']= 0.0
-    current['execution']=distri[0]['execution']
-    for state in distri:
-        if (current['execution'] == state['execution']):
-            current['prob'] = current['prob'] + state['prob']
-        else:
-            collapsed.append(current)
-            current = state
-    collapsed.append(state)
-    return collapsed
 
 # Calculates the deadline miss probability for a given distribution and the time,
 # i.e., tests if the workload is larger than the execution time and sums up the

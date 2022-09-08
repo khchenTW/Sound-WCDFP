@@ -14,10 +14,18 @@ from algorithms import chernoff, taskConvolution
 def func_star(a_b):
     #Covert f([a,b,c,d,e,f]) to f(a,b,c,d,e,f) call
     return insideroutine(*a_b)
+
 '''
 @function this is for parellel execution
 '''
-def insideroutine(taskset, max_fault_rate):
+def func_star_CB(a_b):
+    #Covert f([a,b,c,d,e,f]) to f(a,b,c,d,e,f) call
+    return insideroutine_CB(*a_b)
+
+'''
+@function this is for parellel execution
+'''
+def insideroutine(taskset, fault_rate):
     results_conv_ori = []
     results_conv_carry = []
     results_conv_inflation = []
@@ -26,13 +34,38 @@ def insideroutine(taskset, max_fault_rate):
     results_inflation = []
 
     #print('Computing the convolution with Original')
-    #results_conv_ori.append(taskConvolution.calculate(taskset, max_fault_rate, [], [], True))
+    results_conv_ori.append(taskConvolution.calculate(taskset, fault_rate, [], [], True))
+    #print('Computing the convolution with Carry-in')
+    results_conv_carry.append(taskConvolution.calculate_safe(taskset, fault_rate, [], [], 'Carryin', True))
+    #print('Computing the convolution with Inflation')
+    results_conv_inflation.append(taskConvolution.calculate_safe(taskset, fault_rate, [], [], 'Inflation', True))
+                            
+    #print('Computing the chernoff bounds with Original')
+    results_ori.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Original'))
+    #print('Computing the chernoff bounds with Carry-in')
+    results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
+    #print('Computing the chernoff bounds with Inflation')
+    results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
+    
+    #print ([results_conv_ori, results_conv_carry, results_conv_inflation, results_ori, results_carry, results_inflation])
+    return [results_conv_ori, results_conv_carry, results_conv_inflation, results_ori, results_carry, results_inflation]
+
+'''
+@function this is for parellel execution (CB only)
+'''
+def insideroutine_CB(taskset, fault_rate):
+    results_conv_ori = []
+    results_conv_carry = []
+    results_conv_inflation = []
+    results_ori = []
+    results_carry = []
+    results_inflation = []
+
+    #print('Computing the convolution with Original')
     results_conv_ori.append(0)
     #print('Computing the convolution with Carry-in')
-    #results_conv_carry.append(taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Carryin', True))
     results_conv_carry.append(0)
     #print('Computing the convolution with Inflation')
-    #results_conv_inflation.append(taskConvolution.calculate_safe(taskset, max_fault_rate, [], [], 'Inflation', True))
     results_conv_inflation.append(0)
                             
     #print('Computing the chernoff bounds with Original')
@@ -41,18 +74,21 @@ def insideroutine(taskset, max_fault_rate):
     results_carry.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry'))
     #print('Computing the chernoff bounds with Inflation')
     results_inflation.append(chernoff.optimal_chernoff_taskset_lowest(taskset, 'Inflation'))
+    
+    #print ([results_conv_ori, results_conv_carry, results_conv_inflation, results_ori, results_carry, results_inflation])
     return [results_conv_ori, results_conv_carry, results_conv_inflation, results_ori, results_carry, results_inflation]
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:f:h:p:u:l", ["ident=", "num_tasks=", "num_sets=", "fault_rate=", "hard_task_factor=", "processes=", "utilization=", "limited"])
+        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:f:h:p:u:lo", ["ident=", "num_tasks=", "num_sets=", "fault_rate=", "hard_task_factor=", "processes=", "utilization=", "limited", "onlyCB"])
     except getopt.GetoptError as err:
         print (str(err))
         sys.exit(2)
 
-    num_tasks, num_sets, max_fault_rate, fault_rate, processes, utilization = 0, 0, 0, 0, 1, 45
+    num_tasks, num_sets, fault_rate, processes, utilization = 0, 0, 0, 1, 45
     ident = None
     limited = False
+    onlyCB = False
 
     for opt, arg in opts:
         if opt in ('-i', '--ident'):
@@ -71,9 +107,10 @@ def main():
             utilization = int(arg)
         if opt in ('-l', '--limited'):
             limited = True
+        if opt in ('-o', '--onlyCB'):
+            onlyCB = True
     
     print ('Evaluating: %d tasksets, %d tasks, fault probability: %f, processes: %r, utilization: %r, limited: %r ' % (num_sets, num_tasks, fault_rate, processes, utilization, limited))
-    #for utilization in np.arange(60, 65, 5): # run for range
     try:
         if ident is not None:
             filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + 's_' + str(num_sets) + 'f_'+ str(fault_rate) + 'h_'+ str(hard_task_factor) + str('l' if limited else '')
@@ -95,11 +132,14 @@ def main():
 
             # Distribute to multiprocesses
             if __name__=='__main__':
-                freeze_support()
+                freeze_support()                
                 p = Pool(processes)
-                rel = (p.map(func_star, zip(tasksets,itertools.repeat(max_fault_rate))))
+                if onlyCB == True:
+                    rel = (p.map(func_star_CB, zip(tasksets,itertools.repeat(fault_rate))))
+                else:
+                    rel = (p.map(func_star, zip(tasksets,itertools.repeat(fault_rate))))
             
-            print('Parallel Computing is Finished!')
+            print('Parallel execution is finished!')
             # Distribute the results into each pile
             for i in rel:
                 results_conv_ori.append(i[0][0])

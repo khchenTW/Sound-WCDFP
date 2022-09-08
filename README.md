@@ -119,10 +119,10 @@ You can find the plotted figures in the same folder ```plots```.
 
 | Paper figure    | Plot in plots            |
 |-----------------|--------------------------|
-| Fig. 6          | (omitted)                |
+| Fig. 6          |                          |
 | Fig. 7          |                          |
 | Fig. 8          |                          |
-| Fig. 9          | (omitted)                |
+| Fig. 9          |                          |
 | Fig. 10         |                          |
 | Fig. 11         |                          |
 

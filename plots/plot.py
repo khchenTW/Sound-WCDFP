@@ -23,9 +23,8 @@ rcParams['ps.useafm'] = True
 rcParams['pdf.use14corefonts'] = True
 rcParams['text.usetex'] = True
 rcParams["figure.figsize"] = (8,9) # for 6 sets - Figure 8 
-#rcParams["figure.figsize"] = (8,9) # for 4 sets
-#rcParams["figure.figsize"] = (5,9) # for 3 sets - Figure 5-6
-#rcParams["figure.figsize"] = (5,9) # for 2 sets
+#rcParams["figure.figsize"] = (5,9) # for 3 sets - Figure 6-7
+#rcParams["figure.figsize"] = (5,9) # for 2 sets - Figure 9-11
 
 def plot_datasets(dataset, view, utilization):
     # format the input as the result
@@ -45,12 +44,12 @@ def plot_datasets(dataset, view, utilization):
         carry.append(inputs[4])
         inflation.append(inputs[5])
     
-    # Figure 5-6
+    # Figure 6-7
     #bxinput.append(conv_ori)
     #bxinput_2.append(conv_carry)
     #bxinput_2.append(conv_inflation)
 
-    # Figure 7
+    # Figure 8
     bxinput.append(conv_ori)
     bxinput.append(ori)
     
@@ -170,120 +169,66 @@ def plot_datasets(dataset, view, utilization):
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:u:s:m:f:h:rv:p", ["ident=", "utilization=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded", "view=", "parallel"])
+        opts, args = getopt.getopt(sys.argv[1:], "i:n:u:s:f:h:l", ["ident=", "num_tasks=","utilization=", "num_sets=", "fault_rate=", "hard_task_factor=", "limited"])
     except getopt.GetoptError as err:
         print (str(err))
         sys.exit(2)
 
-    # num_tasks,
-    num_sets, max_fault_rate, step_size_fault_rate, hard_task_factor = 0, 0, 0, 0
-    ident, view, title = None, None, None
-    rounded = False
-    parallel = False
-
+    num_tasks, num_sets, fault_rate, hard_task_factor = 0, 0, 0, 0
+    ident = None
+    limited = False
     utilization = 45
     for opt, arg in opts:
         if opt in ('-i', '--ident'):
             ident = str(arg)
-        # if opt in ('-n', '--num_tasks'):
-        #     num_tasks = int(arg)
+        if opt in ('-n', '--num_tasks'):
+            num_tasks = int(arg)
         if opt in ('-u', '--utilization'):
             utilization = int(arg)
-        # if opt in ('-s', '--num_sets'):
-        #     num_sets = int(arg)
-        if opt in ('-m', '--max_fault_rate'):
-            max_fault_rate = min(1.0, float(arg))
-        if opt in ('-f', '--fault_rate_step_size'):
-            step_size_fault_rate = min(1.0, float(arg))
+        if opt in ('-s', '--num_sets'):
+            num_sets = int(arg)
+        if opt in ('-f', '--fault_rate'):
+            fault_rate = min(1.0, float(arg))
         if opt in ('-h', '--hard_task_factor'):
             hard_task_factor = float(arg)
-        if opt in ('-r', '--rounded'):
-            rounded = True
-        if opt in ('-v', '--view'):
-            view = str(arg)
-        if opt in ('-p', '--parallel'):
-            parallel = True
+        if opt in ('-l', '--limited'):
+            limited = True
 
     datasets = []
-    # for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
     dataset = []
 
-    #for num_tasks, num_sets in zip([15, 25], [20, 20] ): # for U45
-    #for num_tasks, num_sets in zip([5, 2], [20, 20]): # for U45
-    #for num_tasks, num_sets in zip([5], [100]): # for Figure 5-6
-    for num_tasks, num_sets in zip([5], [20]): # for 
-        if ident is not None:
-            #filename_ori = 'res_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
-            if parallel == True:
-                filename_ori = 'mp_res_ori_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
-                filename_carry = 'mp_res_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) +str('r' if rounded else '')
-                filename_inflation = 'mp_res_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
-                
-                filename_conv_ori = 'mp_res_conv_ori_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
-                filename_conv_carry = 'mp_res_conv_carry_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
-                filename_conv_inflation = 'mp_res_conv_inflation_tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
+    if ident is not None:
+        filename = 'tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + 's_' + str(num_sets) + 'f_'+ str(fault_rate) + 'h_'+ str(hard_task_factor) + str('l' if limited else '')
+        filename_ori = 'mp_res_ori_' + filename
+        filename_carry = 'mp_res_carry_' + filename
+        filename_inflation = 'mp_res_inflation_' + filename        
+        filename_conv_ori = 'mp_res_conv_ori_' + filename
+        filename_conv_carry = 'mp_res_conv_carry_' + filename
+        filename_conv_inflation = 'mp_res_conv_inflation_' + filename
 
-            try:
-                #results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
-                # server :
-                #results_conv_ori = np.load('../results_epyc0/' + filename_conv_ori + '.npy', allow_pickle=True)
-                #results_conv_carry = np.load('../results_epyc0/' + filename_conv_carry + '.npy', allow_pickle=True)
-                #results_conv_inflation = np.load('../results_epyc0/' + filename_conv_inflation + '.npy', allow_pickle=True)
+        try:
+            results_conv_ori = np.load('../results/' + filename_conv_ori + '.npy', allow_pickle=True)
+            results_conv_carry = np.load('../results/' + filename_conv_carry + '.npy', allow_pickle=True)
+            results_conv_inflation = np.load('../results/' + filename_conv_inflation + '.npy', allow_pickle=True)
+            
+            results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
+            results_carry = np.load('../results/' + filename_carry + '.npy', allow_pickle=True)
+            results_inflation = np.load('../results/' + filename_inflation + '.npy', allow_pickle=True)
+            
+            for res_ori, res_carry, res_inflation, res_conv_ori, res_conv_carry, res_conv_inflation in zip(results_ori, results_carry, results_inflation, results_conv_ori, results_conv_carry, results_conv_inflation):            
+                dataset.append([res_conv_ori, res_conv_carry, res_conv_inflation, res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
+            plot = plot_datasets(dataset, view, utilization)
+            save_pdf = PdfPages('./'+ ident + '_' + str(num_tasks) + '_' + str(num_sets)+  '_' +str(utilization)+ '_'+str(fault_rate)+'.pdf')
+            # save_pdf = PdfPages(ident  + '_' + str(view) + '.pdf')
+            save_pdf.savefig(plot, bbox_inches='tight', pad_inches=0.0)
+            save_pdf.close()
 
-                #results_ori = np.load('../results_epyc0/' + filename_ori + '.npy', allow_pickle=True)
-                #results_carry = np.load('../results_epyc0/' + filename_carry + '.npy', allow_pickle=True)
-                #results_inflation = np.load('../results_epyc0/' + filename_inflation + '.npy', allow_pickle=True)
-
-                # server:
-                #results_conv_ori = np.load('../results_epyc0/1100/' + filename_conv_ori + '.npy', allow_pickle=True)
-                #results_conv_carry = np.load('../results_epyc0/1100/' + filename_conv_carry + '.npy', allow_pickle=True)
-                #results_conv_inflation = np.load('../results_epyc0/1100/' + filename_conv_inflation + '.npy', allow_pickle=True)
-
-                #results_ori = np.load('../results_epyc0/1100/' + filename_ori + '.npy', allow_pickle=True)
-                #results_carry = np.load('../results_epyc0/1100/' + filename_carry + '.npy', allow_pickle=True)
-                #results_inflation = np.load('../results_epyc0/1100/' + filename_inflation + '.npy', allow_pickle=True)
-
-                # laptop:
-                results_conv_ori = np.load('../results/' + filename_conv_ori + '.npy', allow_pickle=True)
-                results_conv_carry = np.load('../results/' + filename_conv_carry + '.npy', allow_pickle=True)
-                results_conv_inflation = np.load('../results/' + filename_conv_inflation + '.npy', allow_pickle=True)
-                
-                results_ori = np.load('../results/' + filename_ori + '.npy', allow_pickle=True)
-                results_carry = np.load('../results/' + filename_carry + '.npy', allow_pickle=True)
-                results_inflation = np.load('../results/' + filename_inflation + '.npy', allow_pickle=True)
-                
-                if view == 'prob_log':
-                    for res_ori, res_carry, res_inflation, res_conv_ori, res_conv_carry, res_conv_inflation in zip(results_ori, results_carry, results_inflation, results_conv_ori, results_conv_carry, results_conv_inflation):
-                        # laptop inputs (with all)
-                        dataset.append([res_conv_ori, res_conv_carry, res_conv_inflation, res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
-                        # server inputs (without CB)
-                        #dataset.append([res_conv_ori, res_conv_carry, res_conv_inflation, 0, 0, 0])
-                    plot = plot_datasets(dataset, view, utilization)
-                    save_pdf = PdfPages('./'+ ident + '_' + str(num_tasks) + '_' + str(num_sets)+ '_' + str(view) + '_' +str(utilization)+ '_'+str(hard_task_factor)+'_'+str(max_fault_rate)+'.pdf')
-                    # save_pdf = PdfPages(ident  + '_' + str(view) + '.pdf')
-                    save_pdf.savefig(plot, bbox_inches='tight', pad_inches=0.0)
-                    save_pdf.close()
-
-                if view == 'counter':
-                    counterInflation = 0
-                    counterCarry = 0
-                    same = 0
-                    for res_carry, res_inflation, res_conv_carry, res_conv_inflation in zip(results_carry, results_inflation, results_conv_carry, results_conv_inflation):
-                        if res_conv_carry > res_conv_inflation:
-                            counterInflation +=1
-                            print('Res: carry'+str(res_conv_carry)+' inflation'+str(res_conv_inflation))
-                        elif res_conv_inflation > res_conv_carry:
-                            counterCarry +=1
-                        else:
-                            same +=1                    
-                    print ('BestU: '+str(utilization)+' TasksPerSet:'+str(num_tasks) +' Fault Rate: '+str(max_fault_rate)+' X: '+ str(hard_task_factor) + ' Inflation-Win: '+ str(counterInflation) + ' Carry-Win: ' + str(counterCarry) + ' BothSame: '+str(same))
-
-            except Exception as e:
-                print (e)
-                continue
-        else:
-            print ('Must specify identifier')
-            return
+        except Exception as e:
+            print (e)
+            continue
+    else:
+        print ('Must specify identifier')
+        return
         
 if __name__=="__main__":
     main()

@@ -25,6 +25,13 @@ import math
 import heapq
 import itertools
 
+'''
+@method: Decide the time points for analyses
+@param task: Task under analysis
+@param higher_priority_tasks: tasks which have higher priority than the targeted task
+@param mode: default is 0 to use k-points effective testing, otherwise check all time points. 
+'''
+
 def findpoints(task, higher_priority_tasks, mode = 0):
     points = []
     if mode == 0: #kpoints
@@ -173,34 +180,13 @@ def goldensectionsearch(function, a, b, tolerance=1e-5):
         return b
 
 '''
-@method: Computes the minimal chernoff bound.
+@method: Computes the minimal chernoff bound for the lowest priority task.
 @param taskset: Taskset under analysis.
 @param bound: name of bound
 @param s_min: Beginning of interval under analysis.
 @param s_max: Ending of interval under analysis.
 @return list of deadline miss probabilities for each task in the task set and runtime
 '''
-def optimal_chernoff_taskset_all(taskset, bound, s_min = 0, s_max = 10e100):
-    results = []
-    for i, task in enumerate(taskset):
-        start_time = time.time()
-        times = findpoints(task, taskset[:i])
-        if bound == 'Inflation':
-            functions = (logmgf_tasks_inflation(taskset[-1], taskset[:-1], time) for time in times)
-        elif bound == 'Original':
-            functions = (logmgf_tasks(taskset[-1], taskset[:-1], time) for time in times)
-        else:
-            functions = (logmgf_tasks_carry(taskset[-1], taskset[:-1], time) for time in times)
-
-        #golden section search
-        candidates = []
-        for function in functions:
-            optimal = goldensectionsearch(function, s_min, s_max)   
-            candidates.append((optimal, function(optimal)))
-        optimal = candidates[np.argmin([x[1] for x in candidates])]
-        elapsed_time = time.time() - start_time
-        results.append({'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time})
-    return results
 
 def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
     start_time = time.time()

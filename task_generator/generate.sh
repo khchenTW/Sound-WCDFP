@@ -11,6 +11,7 @@
 
 python generate.py -i rtss -n 2 -s 10 -f 0.025 -h 1.83 -r -l # [1,10]
 python generate.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -r -l # [1,10]
+python generate.py -i rtss -n 2 -s 10 -f 0.025 -h 1.83 -r # [1,100]
 python generate.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -r # [1,100]
 python generate.py -i rtss -n 15 -s 10 -f 0.025 -h 1.83 -r # [1,100]
 python generate.py -i rtss -n 25 -s 10 -f 0.025 -h 1.83 -r # [1,100]
