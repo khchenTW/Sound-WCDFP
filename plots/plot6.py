@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import itertools
 import matplotlib
-# matplotlib.use('Agg')
 plt.switch_backend('Agg')
 from matplotlib import rcParams
 from matplotlib.backends.backend_pdf import PdfPages
@@ -108,9 +107,6 @@ def plot_datasets(dataset, utilization):
     ax.boxplot(bxinput_2, 0, '', labels=labels, boxprops=boxprops, whiskerprops=whiskerprops, capprops=capprops, medianprops=medianprops, widths=(0.6, 0.6))
     ax.grid()
 
-    #plt.legend(handles=[av, box, whisk], fontsize=12, frameon=True, loc=3)
-    #plt.clf()
-    #plt.show()
     return fig
 
 def main():

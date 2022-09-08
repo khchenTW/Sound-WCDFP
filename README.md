@@ -76,18 +76,18 @@ cd ..
 
 ## How to run the experiments
 
-The following steps explain how to repeat the evaluation of the paper on a common platform. Please note that, the number of tasksets is set to 20 to have a quick test. The evaluation in the paper set s as 100. 
+The following steps explain how to repeat the evaluation of the paper on a common platform. 
 
-### Synthesize Tasksets:
+### Synthesize Tasksets
 
 First, synthesize tasksets for analysis.
 ```
 cd Sound-WCDFP/task_generator
 ./generate.sh
 ```
-Once the tasksets are successfully generated, you can find quite a few ```*.npy``` files are generated in the folder ```tasksets``` for further usage.
+Once the tasksets are successfully generated, you can find quite a few ```.npy``` files are generated in the folder ```tasksets``` for further usage.
 
-### Applying the proposed analyses:
+### Applying the proposed analyses
 
 Second, apply the proposed analyses on the generated tasksets.
 ```
@@ -107,7 +107,7 @@ As a reference, we employed a laptop running Archlinux 5.17.3-arch1-1 x86_64 GNU
 | Fig. 10         |  38.85s                    |
 | Fig. 11         |  (a) 535.64s, (b) 4391.27s |
 
-Please note that the evaluation in the paper adopted 100 sets per configuration.
+Please note that the evaluation in the paper adopted 100 sets per configuration. Quite a few ```.npy``` intermediate data will be resulted in ```Sound-WCDFP/results```.
 
 ### Plotting the figures
 
@@ -116,7 +116,7 @@ Finally, plot the analyzed results.
 cd Sound-WCDFP/plots
 ./plot.sh
 ```
-You can find the plotted figures in the folder ```outputs```. 
+You can find the plotted figures in the folder ```outputs```. The following table describes the mapping between the figures and the outputed pdfs.
 
 | Paper Figure    |  Plot in ```plots/outputs```      |
 |-----------------|-----------------------------------|
@@ -129,7 +129,7 @@ You can find the plotted figures in the folder ```outputs```.
 
 ## Overview of the corresponding functions
 
-The following tables describe the mapping between content of our paper and the source code in this repository.
+The following table describes the mapping between content and the source code in this repository.
 
 On Paper | Source code 
 --- | --- 

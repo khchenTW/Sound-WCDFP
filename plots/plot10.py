@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import itertools
 import matplotlib
-# matplotlib.use('Agg')
 plt.switch_backend('Agg')
 from matplotlib import rcParams
 from matplotlib.backends.backend_pdf import PdfPages
@@ -52,22 +51,15 @@ def plot_datasets(dataset, utilization):
     colors = itertools.cycle(('c','r','b','g','r','y','y','b'))
     names = []
     fig = plt.figure()    
-    #gs = gridspec.GridSpec(1, 2, width_ratios=[1.1, 2]) 
-    #ax = plt.subplot(gs[0])
     ax = fig.add_subplot(111)    
-    #ax.set_facecolor('0.9')
     fig.subplots_adjust (top = 0.5, bottom = 0.2, left = 0.1, right = 0.95, hspace = 0.3, wspace=0.05)
     ax.set_yscale("log")
     ax.set_ylabel('WCDFP (log-scale)',size=20)
     ax.tick_params(axis='both', which='major',labelsize=12)
-    #ax.vlines(0.5, 0, 1, linestyles='dotted', transform=ax.transAxes)
 
     # Figure 9 and 10
     ax.set_ylim([10**-30, 10**5])
     ax.set_yticks([10**-30, 10**-20, 10**-10, 10**0]) # for CB sets U45
-    # Figure 11
-    #ax.set_ylim([10**-300, 10**5]) # for CB sets
-    #ax.set_yticks([10**-300, 10**-200, 10**-100, 10**0]) # for CB sets task 25/15
 
     labels = ['CB-CarryIn','CB-Inflation']
     #the blue box
@@ -86,9 +78,6 @@ def plot_datasets(dataset, utilization):
     ax.boxplot(bxinput, 0, '', labels=labels, boxprops=boxprops, whiskerprops=whiskerprops, capprops=capprops, medianprops=medianprops, widths=(0.6, 0.6)) # 2 sets
     ax.grid()
 
-    #plt.legend(handles=[av, box, whisk], fontsize=12, frameon=True, loc=3)
-    #plt.clf()
-    #plt.show()
     return fig
 
 def main():

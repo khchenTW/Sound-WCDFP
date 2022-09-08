@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import itertools
 import matplotlib
-# matplotlib.use('Agg')
 plt.switch_backend('Agg')
 from matplotlib import rcParams
 from matplotlib.backends.backend_pdf import PdfPages
