@@ -201,8 +201,12 @@ def optimal_chernoff_taskset_lowest(taskset, bound, s_min = 0, s_max = 10e100):
     #golden section search
     candidates = []
     for function in functions:
-        optimal = goldensectionsearch(function, s_min, s_max)   
-        candidates.append((optimal, function(optimal)))
+        try:
+            optimal = goldensectionsearch(function, s_min, s_max)   
+            candidates.append((optimal, function(optimal)))
+        except Exception as e:
+            # note that the usage of mgf might make the function too complex to be compared. We bypass this case.
+            pass
     optimal = candidates[np.argmin([x[1] for x in candidates])]
     elapsed_time = time.time() - start_time
     return {'ErrProb' : min(1.0, mp.exp(str(optimal[1]))), 'ms' : elapsed_time}

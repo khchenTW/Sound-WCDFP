@@ -164,7 +164,7 @@ def main():
             for res_ori, res_carry, res_inflation, res_conv_ori, res_conv_carry, res_conv_inflation in zip(results_ori, results_carry, results_inflation, results_conv_ori, results_conv_carry, results_conv_inflation):            
                 dataset.append([res_conv_ori, res_conv_carry, res_conv_inflation, res_ori['ErrProb'], res_carry['ErrProb'], res_inflation['ErrProb']])
             plot = plot_datasets(dataset, utilization)
-            save_pdf = PdfPages('./outputs/Fig_6u'+str(utilization)+'.pdf')
+            save_pdf = PdfPages('./outputs/Fig6_u'+str(utilization)+'.pdf')
             save_pdf.savefig(plot, bbox_inches='tight', pad_inches=0.0)
             save_pdf.close()
 

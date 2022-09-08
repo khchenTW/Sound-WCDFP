@@ -26,21 +26,7 @@ sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
 ```
 
-To run the experiments Python 3.10 is required (another version of Python 3 might also work). Moreover, the following packages are required:
-```
-getopt
-math
-matplotlib
-multiprocessing
-numpy
-scipy
-sympy
-os
-pickle
-random
-statistics
-sys
-```
+To run the experiments Python 3.10 was adopted in the evaluation of the paper. Note that another version of Python 3 might also work. 
 
 Assuming that Python 3.10 is installed in the targeted machine, to install the required packages:
 ```
@@ -50,7 +36,7 @@ or
 ```
 python3.10 -m pip install matplotlib numpy scipy sympy
 ```
-Note that Python 3.10 might not require all dependncies listed above.
+Note that there could be unlisted dependncies, depending on the adopted version of Python. Please install them by yourself.
 
 ## File Structure
     .
@@ -108,36 +94,56 @@ Second, apply the proposed analyses on the generated tasksets.
 cd Sound-WCDFP/evaluations
 ./evaluate.sh
 ```
-As a reference, we utilize a machine running Archlinux 5.17.3-arch1-1 x86_64 GNU/Linux,with i7-10610U CPU and 16 GB main memory. It takes about xxx seconds with this machine to obtain these figures, when set ```num_processes = 2``` in ```main.py```.
+In this script, we partition the experiments according to the figures in the paper. The setup of 10 sets was for quick testing and artifact evaluation.
+
+As a reference, we employed a laptop running Archlinux 5.17.3-arch1-1 x86_64 GNU/Linux, with i7-10610U CPU and 16 GB main memory. The following table reports the time it took for each experiment, when the number of processes was set to 4 with only 10 sets per configuration:
+
+| Paper Figure    |  Elapsed Time (avg)        |
+|-----------------|----------------------------|
+| Fig. 6          |  46.88s                    |
+| Fig. 7          |  (a) 504.45s, (b) 144.06s  |
+| Fig. 8          |  504.45s                   |
+| Fig. 9          |  19.71s                    |
+| Fig. 10         |  38.85s                    |
+| Fig. 11         |  (a) 535.64s, (b) 4391.27s |
+
+Please note that the evaluation in the paper adopted 100 sets per configuration.
 
 ### Plotting the figures
+
+Finally, plot the analyzed results.
 ```
 cd Sound-WCDFP/plots
 ./plot.sh
 ```
-You can find the plotted figures in the same folder ```plots```. 
+You can find the plotted figures in the folder ```outputs```. 
 
-| Paper figure    | Plot in plots            |
-|-----------------|--------------------------|
-| Fig. 6          |                          |
-| Fig. 7          |                          |
-| Fig. 8          |                          |
-| Fig. 9          |                          |
-| Fig. 10         |                          |
-| Fig. 11         |                          |
+| Paper Figure    |  Plot in ```plots/outputs```      |
+|-----------------|-----------------------------------|
+| Fig. 6          |  Fig6_u60 and Fig6_u80            |
+| Fig. 7          |  Fig7_u60 and Fig7_u80            |
+| Fig. 8          |  Fig8                             |
+| Fig. 9          |  Fig9_2tasks and Fig9_5tasks      |
+| Fig. 10         |  Fig10_2tasks and Fig10_5tasks    |
+| Fig. 11         |  Fig11_15tasks and Fig11_25tasks  |
 
 ## Overview of the corresponding functions
 
 The following tables describe the mapping between content of our paper and the source code in this repository.
 
-**Section 4** (Safe Bounds for WCDFP and WCRTEP):
 On Paper | Source code 
 --- | --- 
-Corollary 12 | rtc_cb.wcrt_analysis_single()
-Corollary 15 | our_analysis.wcrt_analysis_single()
+Theorem 8 (Refuted) | taskConvolution.calculate()
+Theorem 9 (Refuted) | chernoff.optimal_chernoff_taskset_lowest(taskset, 'Original')
+Corollary 12 | taskConvolution.calculate_safe()
+Corollary 15 | chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry' or 'Inflation')
+
+The implementations of task-level convolution and Chernoff-bound are from the corresponding papers, respectively:
+- Georg von der Brüggen, Nico Piatkowski, Kuan-Hsun Chen, Jian-Jia Chen, Katharina Morik: Efficiently Approximating the Probability of Deadline Misses in Real-Time Systems. ECRTS 2018: 6:1-6:22
+- Kuan-Hsun Chen, Niklas Ueter, Georg von der Brüggen, Jian-Jia Chen: Efficient Computation of Deadline-Miss Probability and Potential Pitfalls. DATE 2019: 896-901
+
 
 ## Miscellaneous
-
 ### Authors
 
 * Kuan-Hsun Chen (University of Twente)
