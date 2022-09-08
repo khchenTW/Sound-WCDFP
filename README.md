@@ -41,7 +41,7 @@ Note that there could be unlisted dependncies, depending on the adopted version 
     .
     ├── algorithms              # Resource packages
     │   ├── chernoff.py         # Optimized Chernoff-Bound approach
-    │   ├── task_convolution.py # Convlution methods
+    │   ├── task_convolution.py # Convolution methods
     │   └── TDA.py              # Time-demand analysis routines	
     ├── evaluations             # Evaluation scripts
     ├── plots                   # Plotter and plots 
@@ -57,7 +57,7 @@ First, clone the git repository or download the [zip file](https://github.com/tu
 git clone https://github.com/tu-dortmund-ls12-rt/Sound-WCDFP.git
 ```
 
-Switch to each subfolder and change the permission of the shell scripts to be executable as follows:
+Switch to each subfolder and set the permission of the scripts to be executable as follows:
 
 ```
 cd Sound-WCDFP/task_generator
@@ -75,7 +75,7 @@ cd ..
 
 ## How to run the experiments
 
-The following steps explain how to repeat the evaluation of the paper on a common platform. 
+The following steps explain how to repeat the evaluation of the paper. 
 
 ### Synthesize Tasksets
 
@@ -88,14 +88,16 @@ Once the tasksets are successfully generated, you can find quite a few ```.npy``
 
 ### Applying the proposed analyses
 
-Second, apply the proposed analyses on the generated tasksets.
+Second, apply the proposed analyses on the generated tasksets above.
 ```
 cd Sound-WCDFP/evaluations
 ./evaluate.sh
 ```
-In this script, we partition the experiments according to the figures in the paper. The setup of 10 sets was for quick testing and artifact evaluation.
+In this script ```evaluate.sh```, we partition the experiments according to the figures in the paper so that each experiment can be executed independently. 
 
-As a reference, we employed a laptop running Archlinux 5.17.3-arch1-1 x86_64 GNU/Linux, with i7-10610U CPU and 16 GB main memory. The following table reports the time it took for each experiment, when the number of processes was set to 4 with only 10 sets per configuration:
+The setup of 10 sets was for quick testing and artifact evaluation. After executing the script, quite a few ```.npy``` intermediate data will be outputed in ```Sound-WCDFP/results```.
+
+As a reference, we employed a laptop running Archlinux 5.17.3-arch1-1 x86_64 GNU/Linux, with i7-10610U CPU and 16 GB main memory. The following table reports the elapsed time it took for each experiment, when the number of processes was set to 4 with 10 task sets per configuration:
 
 | Paper Figure    |  Elapsed Time (avg)        |
 |-----------------|----------------------------|
@@ -106,7 +108,7 @@ As a reference, we employed a laptop running Archlinux 5.17.3-arch1-1 x86_64 GNU
 | Fig. 10         |  38.85s                    |
 | Fig. 11         |  (a) 535.64s, (b) 4391.27s |
 
-Please note that the evaluation in the paper adopted 100 sets per configuration. Quite a few ```.npy``` intermediate data will be resulted in ```Sound-WCDFP/results```.
+Please note that the evaluation in the paper adopted 100 sets per configuration. 
 
 ### Plotting the figures
 
@@ -115,7 +117,9 @@ Finally, plot the analyzed results.
 cd Sound-WCDFP/plots
 ./plot.sh
 ```
-You can find the plotted figures in the folder ```outputs```. The following table describes the mapping between the figures and the outputed pdfs.
+The plotted figures can be found in the folder ```outputs```. 
+
+The following table describes the mapping between the figures and the outputed pdfs.
 
 | Paper Figure    |  Plot in ```plots/outputs```      |
 |-----------------|-----------------------------------|
@@ -128,7 +132,7 @@ You can find the plotted figures in the folder ```outputs```. The following tabl
 
 ## Overview of the corresponding functions
 
-The following table describes the mapping between content and the source code in this repository.
+The following table describes the mapping between the paper content and the corresponding functions in the source code.
 
 On Paper | Source code 
 --- | --- 
@@ -137,7 +141,7 @@ Theorem 9 (Refuted) | chernoff.optimal_chernoff_taskset_lowest(taskset, 'Origina
 Corollary 12 | taskConvolution.calculate_safe()
 Corollary 15 | chernoff.optimal_chernoff_taskset_lowest(taskset, 'Carry' or 'Inflation')
 
-The implementations of task-level convolution and Chernoff-bound are from the corresponding papers, respectively:
+The implementations of task-level convolution and Chernoff-bound are adapted from the corresponding papers, respectively:
 - Georg von der Brüggen, Nico Piatkowski, Kuan-Hsun Chen, Jian-Jia Chen, Katharina Morik: Efficiently Approximating the Probability of Deadline Misses in Real-Time Systems. ECRTS 2018: 6:1-6:22
 - Kuan-Hsun Chen, Niklas Ueter, Georg von der Brüggen, Jian-Jia Chen: Efficient Computation of Deadline-Miss Probability and Potential Pitfalls. DATE 2019: 896-901
 
