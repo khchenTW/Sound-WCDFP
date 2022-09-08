@@ -20,15 +20,14 @@ Some common software should be installed:
 ```
 sudo apt-get install software-properties-common git python3.10
 ```
-If the installation of Python3.10 doesn't work, likely you need to add deadsnakes PPA beforehand as it is not available on universe repo:
+If the installation of Python 3.10 doesn't work, likely you need to add deadsnakes PPA beforehand as it is not available on universe repo:
 ```
 sudo add-apt-repository ppa:deadsnakes/ppa
 sudo apt-get update
 ```
-
 To run the experiments Python 3.10 was adopted in the evaluation of the paper. Note that another version of Python 3 might also work. 
 
-Assuming that Python 3.10 is installed in the targeted machine, to install the required packages:
+Assuming that Python 3.10 has been successfully installed in the targeted machine, to install the required packages:
 ```
 pip3 install matplotlib numpy scipy sympy
 ```
@@ -41,14 +40,14 @@ Note that there could be unlisted dependncies, depending on the adopted version 
 ## File Structure
     .
     ├── algorithms              # Resource packages
-    │   ├── chernoff.py         # Optimized Chernoff Bound approach
+    │   ├── chernoff.py         # Optimized Chernoff-Bound approach
     │   ├── task_convolution.py # Convlution methods
     │   └── TDA.py              # Time-demand analysis routines	
     ├── evaluations             # Evaluation scripts
-    ├── plots                   # Plotter and Plots 
-    ├── results                 # Results of Evaluations
-    ├── task_generator          # Taskset Generator
-    ├── tasksets                # Generated Tasksets
+    ├── plots                   # Plotter and plots 
+    ├── results                 # Results of evaluations
+    ├── task_generator          # Taskset generator
+    ├── tasksets                # Generated tasksets
     └── README.md
 
 ## How to deploy
