@@ -1,5 +1,5 @@
 '''
-Author: Niklas Ueter, Kuan-Hsun Chen
+Author: Kuan-Hsun Chen, Mario Guenzel, Niklas Ueter
 '''
 
 from __future__ import division
@@ -79,7 +79,7 @@ def logmgf_tasks_carry(task, other, interval):
 @param a: number of jobs released in the interval
 @param b: jobs released over interval + relative deadlines of tasks that are affected by the task i, i.e., i to k-1.
 '''
-def sample_inflate_bernoulli_2(task, a, b):
+def sample_inflate_bernoulli(task, a, b):
     task['infpdf'] = list()
     if a > b:
         print ("SAI is not applicable here, so no inflation")
@@ -119,7 +119,7 @@ def logmgf_tasks_inflation(task, other, interval):
         sainum_jobs= int(math.ceil(float((interval+exttime))/task['period']))
         # Calculate the extended interval
         # make an inflated task
-        task = sample_inflate_bernoulli_2(task, num_jobs_released, sainum_jobs)
+        task = sample_inflate_bernoulli(task, num_jobs_released, sainum_jobs)
         #print('numberReleased: '+str(num_jobs_released))
         #print('window: '+str(int(math.ceil(float(extInterval)/task['period']))))
         #print(task['infpdf'])
@@ -129,7 +129,6 @@ def logmgf_tasks_inflation(task, other, interval):
 
     s = symbols('s')
     func = '(' + '+'.join(logmgf_task(tsk, interval) for tsk in (np.concatenate(([task], other)) if other is not None else [task])) + ') -' + 's*' + str(interval)
-    #print(func)
     func = lambdify(s, sympify(func), 'mpmath')
     return func
 
@@ -255,7 +254,7 @@ if __name__ == '__main__':
 
     
     # sample inflate at t=4
-    #prob_SAI_t4 = sample_inflate_bernoulli_2(tsk1, math.ceil(4 / tsk1['period']), math.ceil((4+tsk1['deadline'])/tsk1['period']))
+    #prob_SAI_t4 = sample_inflate_bernoulli(tsk1, math.ceil(4 / tsk1['period']), math.ceil((4+tsk1['deadline'])/tsk1['period']))
     # should be 1.0 with prob 0.9*0.9 and 2.5 with prob 1-0.9*0.9
     # and therefore deadline miss with prob 1-0.9*0.9
     # with carry-in you get guaranteed deadline miss

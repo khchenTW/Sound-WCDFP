@@ -1,64 +1,33 @@
 #!/bin/bash
 
-#python evaluations.py -i rtss -n 10 -s 2 -m 0.025 -f 0.025 -h 1.83 -r 0  
-#python evaluations.py -i rtss -n 10 -s 1 -m 0.025 -f 0.025 -h 1.83 -r 0 
-#python evaluations.py -i rtss -n 2 -s 1 -m 0.025 -f 0.025 -h 1.83 -r 0 
-#python evaluations.py -i rtss -n 10 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 0 -p
-#python evaluations.py -i rtss -n 10 -s 20 -m 0.025 -f 0.025 -h 1.83 -r 0 -p
+# each line represents one specific configuration
+# - i is the meta name
+# - n is the number of tasks per set  
+# - s is the number of sets 
+# - f is the fault rate 
+# - h is the execution time of the longer version 
+# - p is the number of processes (default is 1)
+# - u is the total utilization
+# - l is the flag for limited range [1,10] (default is [1,100])
 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.001 -f 0.001 -h 1.0 -r 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.0 -r 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.001 -f 0.001 -h 1.1 -r 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.1 -r 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.001 -f 0.001 -h 1.2 -r 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.2 -r 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.001 -f 0.001 -h 1.83 -r 
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.83 -r 
+# Fig 6
+#python evaluations.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -p 2 -u 60 -l 
+#python evaluations.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -p 2 -u 80 -l
 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.001 -f 0.001 -h 1.0 -r 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.025 -f 0.025 -h 1.0 -r 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.001 -f 0.001 -h 1.1 -r 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.025 -f 0.025 -h 1.1 -r 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.001 -f 0.001 -h 1.2 -r 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.025 -f 0.025 -h 1.2 -r 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.001 -f 0.001 -h 1.83 -r 
-#python evaluations.py -i rtss -n 3 -s 20 -m 0.025 -f 0.025 -h 1.83 -r 
+# Fig 7, 8
+#python evaluations.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -p 2 -u 60 
+#python evaluations.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -p 2 -u 80
 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.001 -f 0.001 -h 1.0 -r 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.0 -r 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.001 -f 0.001 -h 1.1 -r 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.1 -r 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.001 -f 0.001 -h 1.2 -r 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.2 -r 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.001 -f 0.001 -h 1.83 -r 
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.83 -r 
+# Fig 9
+python evaluations.py -i rtss -n 2 -s 10 -f 0.025 -h 1.83 -p 2 -u 45 -l # only CB
+#python evaluations.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -p 2 -u 45 -l # only CB
 
-# before lunch
-#python evaluations.py -i rtss -n 2 -s 10 -m 0.001 -f 0.001 -h 1.83 -r 
-#python evaluations.py -i rtss -n 2 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 
-#python evaluations.py -i rtss -n 3 -s 10 -m 0.001 -f 0.001 -h 1.83 -r 
-#python evaluations.py -i rtss -n 3 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 
-#python evaluations.py -i rtss -n 5 -s 10 -m 0.001 -f 0.001 -h 1.83 -r 
-#python evaluations.py -i rtss -n 5 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 
-#python evaluations.py -i rtss -n 10 -s 10 -m 0.001 -f 0.001 -h 1.83 -r 
-#python evaluations.py -i rtss -n 10 -s 10 -m 0.025 -f 0.025 -h 1.83 -r 
+# Fig 10
+#python evaluations.py -i rtss -n 2 -s 10 -f 0.025 -h 1.83 -p 2 -u 45 # only CB
+#python evaluations.py -i rtss -n 5 -s 10 -f 0.025 -h 1.83 -p 2 -u 45 # only CB
 
-# after lunch
-#python evaluations.py -i rtss -n 2 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 3 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 5 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 20 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 15 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 20 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
-
-# shepherding
-
-#python evaluations.py -i rtss -n 2 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p
-#python evaluations.py -i rtss -n 5 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p # 6 methods
-python evaluations.py -i rtss -n 5 -s 100 -m 0.025 -f 0.025 -h 1.83 -r -p # only CB
-#python evaluations.py -i rtss -n 15 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p # only CB
-#python evaluations.py -i rtss -n 25 -s 20 -m 0.025 -f 0.025 -h 1.83 -r -p # only CB
+# Fig 11
+#python evaluations.py -i rtss -n 15 -s 10 -f 0.025 -h 1.83 -p 2 -u 45  # only CB
+#python evaluations.py -i rtss -n 25 -s 10 -f 0.025 -h 1.83 -p 2 -u 45  # only CB
 
 sleep 1
