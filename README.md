@@ -52,9 +52,9 @@ Note that there could be unlisted dependncies, depending on the adopted version 
 
 ## How to deploy
 
-First, clone the git repository or download the [zip file](https://github.com/khchenTW/Sound-WCDFP/archive/refs/heads/main.zip):
+First, clone the git repository or download the [zip file](https://github.com/tu-dortmund-ls12-rt/Sound-WCDFP/archive/refs/heads/main.zip):
 ```
-git clone https://github.com/khchenTW/Sound-WCDFP.git
+git clone https://github.com/tu-dortmund-ls12-rt/Sound-WCDFP.git
 ```
 
 Switch to each subfolder and change the permission of the shell scripts to be executable as follows:
