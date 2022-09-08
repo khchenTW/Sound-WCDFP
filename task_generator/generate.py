@@ -9,7 +9,7 @@ sys.path.append('../')
 from algorithms import TDA
 
 '''
- @method Generates tasksets that can pass the time-demand analysis
+ @method Generates tasksets that can pass the time-demand analysis with only normal execution time
  @param utilization: Taskset utilizations
  @param hard_task_factor: Multiplier in case of abnormal mode
  @param fault_rate: Probability of a job being in abnormal mode
@@ -37,12 +37,12 @@ def tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_task, n
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:m:f:h:rl", ["ident=", "num_tasks=", "num_sets=", "max_fault_rate=", "fault_rate_step_size=", "hard_task_factor=", "rounded", "limited"])
+        opts, args = getopt.getopt(sys.argv[1:], "i:n:s:f:h:rl", ["ident=", "num_tasks=", "num_sets=", "fault_rate=", "hard_task_factor=", "rounded", "limited"])
     except getopt.GetoptError as err:
         print (str(err))
         sys.exit(2)
 
-    num_tasks, num_sets, max_fault_rate, step_size_fault_rate, hard_task_factor = 0, 0, 0, 0, 0
+    num_tasks, num_sets, fault_rate, hard_task_factor = 0, 0, 0, 0
     ident = None
     rounded = False
     limited = False
@@ -53,10 +53,8 @@ def main():
             num_tasks = int(arg)
         if opt in ('-s', '--num_sets'):
             num_sets = int(arg)
-        if opt in ('-m', '--max_fault_rate'):
-            max_fault_rate = min(1.0, float(arg))
-        if opt in ('-f', '--fault_rate_step_size'):
-            step_size_fault_rate = min(1.0, float(arg))
+        if opt in ('-f', '--fault_rate'):
+            fault_rate = min(1.0, float(arg))
         if opt in ('-h', '--hard_task_factor'):
             hard_task_factor = float(arg)
         if opt in ('-r', '--rounded'):
@@ -64,20 +62,17 @@ def main():
         if opt in ('-l', '--limited'):
             limited = True
 
-    for fault_rate in np.arange(step_size_fault_rate, max_fault_rate + step_size_fault_rate, step_size_fault_rate):
-        print('Generating: %d tasksets, %d tasks, fault probability: %f, rounded: %r' % (num_sets, num_tasks, fault_rate, rounded))
-        #for utilization in np.arange(60, 65, 5):
-        #for utilization in np.arange(45, 55, 5): # have generated
-        for utilization in np.arange(80, 85, 5): 
-            tasksets = tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_tasks, num_sets, rounded, limited)
-            try:
-                if ident is not None:
-                    filename = '../tasksets/tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + '_m' + str(num_sets) + 's_'+ str(max_fault_rate) + 'f_' + str(step_size_fault_rate) + 'h_'+ str(hard_task_factor) + str('r' if rounded else '')
-                    np.save(filename, tasksets)
-                else:
-                    raise Exception ("Please specify an identifier!")
-            except IOError:
-                print('Could not write filename %s' % filename)
+    print('Generating: %d tasksets, %d tasks, fault probability: %f, rounded: %r' % (num_sets, num_tasks, fault_rate, rounded))
+    for utilization in (45, 60, 80):
+        tasksets = tasksets_gen_with_tda(utilization, hard_task_factor, fault_rate, num_tasks, num_sets, rounded, limited)
+        try:
+            if ident is not None:
+                filename = '../tasksets/tasksets_' + ident + '_n_' + str(num_tasks) + 'u_' + str(utilization) + 's_' + str(num_sets) + 'f_'+ str(fault_rate) + 'h_'+ str(hard_task_factor) + str('l' if limited else '')
+                np.save(filename, tasksets)
+            else:
+                raise Exception ("Please specify an identifier!")
+        except IOError:
+            print('Could not write filename %s' % filename)
 
 if __name__=="__main__":
     main()
