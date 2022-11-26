@@ -35,7 +35,14 @@ or
 ```
 python3.10 -m pip install matplotlib numpy scipy sympy
 ```
-Note that there could be unlisted dependncies, depending on the adopted version of Python. Please install them by yourself.
+Note that there could be unlisted dependncies, depending on the adopted version of Python. Here is a list of the additional dependencies for a fresh Ubuntu 22.04, suggested by the reviewers of artifact evaluation:
+- python3-pip
+- python3-tk
+- texlive-latex-recommended
+- texlive-latex-extra
+- dvipng
+- cm-super
+If your environment does not alias python to python3, or there is no python program in the path by default, please manually handle them.
 
 ## File Structure
     .
